@@ -1,6 +1,6 @@
 {
   "name": "vue-element-excel",
-  "version": "1.0.10",
+  "version": "1.1.0",
   "description": "vue element excel less",
   "author": "969739269@qq.com",
   "private": false,
@@ -10,6 +10,10 @@
     "plug_build": "node build/build.js distbuild",
     "start": "npm run dev",
     "build": "node build/build.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HelloWoed/vue-report"
   },
   "dependencies": {
     "element-ui": "^2.8.2",

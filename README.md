@@ -102,6 +102,7 @@ attr_data_conf={
       :indrSelectChange="calculationConf.indrSelectChange"
       :dimensionData="calculationConf.dimensionData"
       :loadIndrNode="calculationConf.loadIndrNode"
+      :symbolData="calculationConf.symbolData"
       :existFuns="calculationConf.existFuns"
       :prop="calculationConf.indrProp" />
     </p>
@@ -192,12 +193,124 @@ export default {
             id:'004',
             name:'最小值',
             value:'MIN'
+          }
+        ],
+        symbolData:[
+          {
+            id:'001',
+            type:'symbol',
+            value:"+"
+          },
+          {
+            id:'002',
+            type:'symbol',
+            value:"-"
+          },
+          {
+            id:'003',
+            type:'symbol',
+            value:"*"
+          },
+          {
+            id:'004',
+            type:'symbol',
+            value:"/"
           },
           {
             id:'005',
-            name:'混合运算',
-            value:"hybirdOpration"
+            type:'symbol',
+            value:"="
           },
+          {
+            id:'006',
+            type:'symbol',
+            value:">"
+          },
+          {
+            id:'007',
+            type:'symbol',
+            value:">="
+          },
+          {
+            id:'008',
+            type:'symbol',
+            value:"<"
+          },
+          {
+            id:'009',
+            type:'symbol',
+            value:"<="
+          },
+          {
+            id:'010',
+            type:'symbol',
+            value:"=="
+          },
+          {
+            id:'011',
+            type:'symbol',
+            value:"!="
+          },
+          {
+            id:'012',
+            type:'symbol',
+            value:"("
+          },
+          {
+            id:'013',
+            type:'symbol',
+            value:")"
+          },
+          {
+            id:'014',
+            type:'symbol',
+            value:"["
+          },
+          {
+            id:'015',
+            type:'symbol',
+            value:"]"
+          },
+          {
+            id:'016',
+            type:'symbol',
+            value:"in"
+          },
+          {
+            id:'017',
+            type:'symbol',
+            value:"not in"
+          },
+          {
+            id:'018',
+            type:'symbol',
+            value:"if"
+          },
+          {
+            id:'019',
+            type:'symbol',
+            value:"else"
+          },
+          {
+            id:'020',
+            type:'symbol',
+            value:"and"
+          },
+          {
+            id:'021',
+            type:'symbol',
+            value:"or"
+          },
+          {
+            id:'022',
+            type:'symbol',
+            value:","
+          },
+          {
+            id:'023',
+            type:'symbol',
+            value:"delete"
+          }
         ],
         loadIndrNode(node, resolve){
           defaultLoadIndr(node, resolve);
@@ -404,7 +517,7 @@ export default {
 > style部分
 ```html
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style lang="less" scoped>
 
 </style>
 

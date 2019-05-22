@@ -14,11 +14,11 @@
                     <span :key="i" >
                         <span
                         class="indr-symbol-item" 
-                        :class="{symbolItem:item.type == 'symbol',activeCalc: curntCalcTar && curntCalcTar.id == item.id && curntCalcTar.value == item.value}" 
+                        :class="{symbolItem:item.type == 'symbol',activeCalc: curntCalcTar && curntCalcTar.id == item.id && curntCalcTar.value == item.value && curntCalcTarIndex == i,activeFun:item.type == 'function'}" 
                         @click="calcItemActivr(item,i)">
                             <span>{{item.value}}</span>
                         </span>
-                        <el-tooltip v-if="curntCalcTar && curntCalcTar.id == item.id  && curntCalcTar.value == item.value" content="删除" placement="bottom" effect="light">
+                        <el-tooltip v-if="curntCalcTar && curntCalcTar.id == item.id  && curntCalcTar.value == item.value && curntCalcTarIndex == i && curntCalcTar.type != 'function'" content="删除" placement="bottom" effect="light">
                             <el-button icon="el-icon-close" size="mini" class="reduceCalcItem" circle @click="delCalcItem(item,i)"></el-button>
                         </el-tooltip>
                     </span>
@@ -56,6 +56,7 @@ export default {
     },
     methods:{
         calcItemActivr(currentTar,index){
+            // if(currentTar.type == 'function')return false;
             if(this.curntCalcTar){
                 if(this.curntCalcTarIndex != index){
                     this.$set(this,'curntCalcTar',currentTar);
@@ -71,6 +72,8 @@ export default {
             this.$emit('changeCalcItem',this.curntCalcTar,this.curntCalcTarIndex);
         },
         delCalcItem(currentTar,index){
+            this.$set(this,'curntCalcTar',null);
+            this.$set(this,'curntCalcTarIndex',null);
             this.$emit('deleteCurntCalcItem',currentTar,index);
         },
         reset(){
@@ -96,7 +99,7 @@ export default {
         }
     }
     .symbolItem{
-        color: #E6A23C;
+        color: #0679f1;
         &:hover{
             background: #DCDFE6;
         }
@@ -110,6 +113,9 @@ export default {
     }
     .reduceCalcItem{
         margin-left: 5px;
-        color:#F56C6C
+        color:#F56C6C;
+    }
+    .activeFun{
+        color:#c200ff;
     }
 </style>

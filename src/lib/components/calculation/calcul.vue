@@ -49,7 +49,7 @@
                         </li>
                     </ul>
                 </div>
-                <div v-if="currentCalcType.value == 'hybirdOpration'">
+                <div>
                     <el-divider><strong>插入符号</strong></el-divider>
                     <div class="symbol">
                         <div class="symbol-item" v-for="(sym,i) in symbolData" :key="i" :class="{'set-position-top': i < 5,'set-position-left': i % 5 == 0}" @click="setSymbols(sym)">{{ sym.value }}</div>
@@ -87,7 +87,7 @@ export default {
                 label:'value'
             }
         }},
-        existFuns:{type:Array,default(){
+        existFuns:{type:Array | Function,default(){
             return [
                 {
                     id:'001',
@@ -116,53 +116,8 @@ export default {
                 }
             ]
         }},
-        loadIndrNode:{type:Function,default: (node, resolve)=>{//指标树形结构load方法
-            defaultLoadIndr(node, resolve);
-        }},
-        dimensionData:{type:Function,default:(data,node,vm)=>{
+        symbolData:{type:Array | Function,default(){
             return [
-                {id:'001',value:'维度指标1'},
-                {id:'002',value:'维度指标2'},
-                {id:'003',value:'维度指标3'},
-                {id:'004',value:'维度指标4'},
-                {id:'005',value:'维度指标5'},
-                {id:'006',value:'维度指标6'},
-            ]
-        }},//维度数据
-        indrSelectChange:{type:Function,default:(data,node,refTree,self)=>{//指标树选择改变时触发
-            //用promise是为了如果此处需要拉接口处理数据，在子组件内需要等接口数据处理完成后才能处理
-            return new Promise((resolve,reject)=>{
-                 //实现单选
-                refTree.setCheckedNodes([]);
-                refTree.setCheckedNodes([data]);
-                resolve(data);
-            });
-        }},
-        getIndrDatas:{type:Function,default:(data)=>{//获取指标数据
-            return [
-                {id:'001',value:'普通本科生因其他休退学数1'},
-                {id:'002',value:'普通本科生因其他休退学数2'},
-                {id:'003',value:'普通本科生因其他休退学数3'},
-                {id:'004',value:'普通本科生因其他休退学数4'},
-                {id:'005',value:'普通本科生因其他休退学数5'},
-                {id:'006',value:'普通本科生因其他休退学数6'},
-                {id:'007',value:'普通本科生因其他休退学数7'},
-                {id:'008',value:'普通本科生因其他休退学数8'},
-                {id:'009',value:'普通本科生因其他休退学数9'},
-                {id:'010',value:'普通本科生因其他休退学数10'},
-            ]
-        }},
-    },
-    components:{Calculations,ValiditorCalc,Indicator,CheckCalc},
-    data(){
-        return {
-            selectedIndr:[],
-            selectedIndrCorpy:[],
-            subSelectedIndr:[],
-            filterIndrVal:null,
-            selIndrDialog:false,
-            calcActive:'calculation',
-            symbolData:[
                 {
                     id:'001',
                     type:'symbol',
@@ -269,11 +224,58 @@ export default {
                     value:"or"
                 },
                 {
-                    id:'022',
+                    id:'023',
                     type:'symbol',
                     value:"delete"
                 }
-            ],
+            ]
+        }},
+        loadIndrNode:{type:Function,default: (node, resolve)=>{//指标树形结构load方法
+            defaultLoadIndr(node, resolve);
+        }},
+        dimensionData:{type:Function,default:(data,node,vm)=>{
+            return [
+                {id:'001',value:'维度指标1'},
+                {id:'002',value:'维度指标2'},
+                {id:'003',value:'维度指标3'},
+                {id:'004',value:'维度指标4'},
+                {id:'005',value:'维度指标5'},
+                {id:'006',value:'维度指标6'},
+            ]
+        }},//维度数据
+        indrSelectChange:{type:Function,default:(data,node,refTree,self)=>{//指标树选择改变时触发
+            //用promise是为了如果此处需要拉接口处理数据，在子组件内需要等接口数据处理完成后才能处理
+            return new Promise((resolve,reject)=>{
+                 //实现单选
+                refTree.setCheckedNodes([]);
+                refTree.setCheckedNodes([data]);
+                resolve(data);
+            });
+        }},
+        getIndrDatas:{type:Function,default:(data)=>{//获取指标数据
+            return [
+                {id:'001',value:'普通本科生因其他休退学数1'},
+                {id:'002',value:'普通本科生因其他休退学数2'},
+                {id:'003',value:'普通本科生因其他休退学数3'},
+                {id:'004',value:'普通本科生因其他休退学数4'},
+                {id:'005',value:'普通本科生因其他休退学数5'},
+                {id:'006',value:'普通本科生因其他休退学数6'},
+                {id:'007',value:'普通本科生因其他休退学数7'},
+                {id:'008',value:'普通本科生因其他休退学数8'},
+                {id:'009',value:'普通本科生因其他休退学数9'},
+                {id:'010',value:'普通本科生因其他休退学数10'},
+            ]
+        }},
+    },
+    components:{Calculations,ValiditorCalc,Indicator,CheckCalc},
+    data(){
+        return {
+            selectedIndr:[],
+            selectedIndrCorpy:[],
+            subSelectedIndr:[],
+            filterIndrVal:null,
+            selIndrDialog:false,
+            calcActive:'calculation',
             currentCalcType:{id:'005',name:'混合运算',value:"hybirdOpration"},
             calculationRes:[],
             changeTarCalcItem:null,
@@ -290,11 +292,32 @@ export default {
     },
     methods:{
         completeCalc(){
-            this.$emit('complete',this.calculationRes);
+            let leftBreaks = this.calculationRes.filter(item=>{return item.value == '('});
+            let rightBreaks = this.calculationRes.filter(item=>{return item.value == ')'});
+            if(leftBreaks.length == rightBreaks.length){
+                if(this.calculationRes[this.calculationRes.length -1] && this.calculationRes[this.calculationRes.length -1].type == 'symbol' && this.calculationRes[this.calculationRes.length -1].value != ')'){
+                    this.$message({
+                        message:'公式运算逻辑有误！',
+                        type:'error'
+                    })
+                }else this.$emit('complete',this.calculationRes);
+            }else{
+                this.$message({
+                    message:'公式逻辑有误，缺少 "(" 或 ")"！',
+                    type:'error'
+                })
+            }
+            
         },
         deleteCurntCalcItem(item,index){
             let {calculationRes} = this;
-            calculationRes.splice(index,1);
+            if(calculationRes[index - 1] && calculationRes[index - 1].type == 'function'){
+                calculationRes.splice(index - 1,2);
+            }else{
+                calculationRes.splice(index,1);
+            }
+            this.changeTarCalcItem = null;
+            this.changeTarCalcItemIndex = null;
             this.$set(this,'calculationRes',calculationRes);
         },
         changeCalcItem(item,index){
@@ -306,9 +329,21 @@ export default {
             this.changeTarCalcItem = null;
             this.changeTarCalcItemIndex = null;
         },
-        setCalcType(type){
-            this.$set(this,'currentCalcType',type);
-            this.$set(this,'calculationRes',[]);
+        setCalcType(fun){
+            
+            let {calculationRes} = this;
+            if(!fun.type)fun.type = 'function';
+            if(this.changeTarCalcItem){
+                calculationRes[this.changeTarCalcItemIndex] = fun;
+            }else{
+                let leftBresk = this.symbolData.filter(item=>{
+                    return item.value == '(';
+                });
+                leftBresk.unshift(fun)
+                calculationRes = calculationRes.concat(leftBresk);
+            }
+            this.$set(this,'calculationRes',JSON.parse(JSON.stringify(calculationRes)));
+            this.$set(this,'currentCalcType',fun);
         },
         setSymbols(symbol){
             let {calculationRes} = this;
@@ -320,7 +355,12 @@ export default {
                 return false;
             }
             if(symbol.value == 'delete'){
-                calculationRes.pop();
+                if(calculationRes[calculationRes.length-2].type == 'function'){
+                    calculationRes.pop();
+                    calculationRes.pop();
+                }else{
+                    calculationRes.pop();
+                }
             }else{
                 if(this.changeTarCalcItem){
                     calculationRes[this.changeTarCalcItemIndex] = symbol;
@@ -328,6 +368,7 @@ export default {
                     calculationRes.push(symbol);
                 }
             }
+            this.currentCalcType = {id:'005',name:'混合运算',value:"hybirdOpration"};
             this.$set(this,'calculationRes',JSON.parse(JSON.stringify(calculationRes)));
         },
         setIndrs(indr){
@@ -336,7 +377,7 @@ export default {
             if(this.changeTarCalcItem){
                 calculationRes[this.changeTarCalcItemIndex] = indr;
             }else{
-                if(calculationRes[calculationRes.length - 1] && calculationRes[calculationRes.length - 1].type == indr.type && this.currentCalcType.value == "hybirdOpration"){
+                if(calculationRes[calculationRes.length - 1] && calculationRes[calculationRes.length - 1].type == indr.type){
                     calculationRes.pop();
                 }
                 calculationRes.push(indr);

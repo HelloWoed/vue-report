@@ -19,13 +19,13 @@
                         </el-tree>
                         <el-divider content-position="left"><strong>维度选择</strong></el-divider>
                         <div class="dimensionlity">
+                            <el-input 
+                                placeholder="请输入内容" 
+                                v-model="filterDimensionlity" 
+                                @input="filterDimensionlityChange" 
+                                suffix-icon="el-icon-search"
+                                clearable></el-input>   
                             <p v-if="dimensionlityData.length > 0">
-                                <el-input 
-                                    placeholder="请输入内容" 
-                                    v-model="filterDimensionlity" 
-                                    @input="filterDimensionlityChange" 
-                                    suffix-icon="el-icon-search"
-                                    clearable></el-input>   
                                 <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" class="radioCheckitem" @change="handleCheckAllChange">全选</el-checkbox>
                                 <el-checkbox-group v-model="dimensionlityChecked" @change="seldimensionlityValChange">
                                     <el-row v-for="(item,i) in dimensionlityData" :key="i">
@@ -43,13 +43,13 @@
             <el-col :span="8">
                 <div class="indicator-grid">
                     <el-divider><strong>可选指标</strong></el-divider>
+                    <el-input 
+                        placeholder="请输入内容" 
+                        v-model="indicatorListVal" 
+                        @input="indicatorListValChange" 
+                        suffix-icon="el-icon-search"
+                        clearable></el-input>  
                     <div v-if="indicatorData.length > 0">
-                        <el-input 
-                            placeholder="请输入内容" 
-                            v-model="indicatorListVal" 
-                            @input="indicatorListValChange" 
-                            suffix-icon="el-icon-search"
-                            clearable></el-input>  
                             <div class="content">
                             <p>
                                 <el-checkbox :indeterminate="isIndeterminateIndr" class="radioCheckitem" v-model="checkAllIndr" @change="handleCheckAllIndrChange">全选</el-checkbox>
