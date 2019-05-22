@@ -1,50 +1,3 @@
-# vue-element-excel
-
-> 此插件 使用vue 基于element-ui，样式使用less语法，使用前应确保相关依赖已安装
-
-## 安装 vue-element-excel
-``` bash
-npm i vue-element-excel
-```
-## 全量引入
-```javascript
-// main.js
-import Vue from 'vue'
-import ElementUI from 'element-ui';
-import 'element-ui/lib/theme-chalk/index.css';
-import VueExcel from 'vue-element-excel'
-Vue.use(ElementUI);
-Vue.use(VueExcel);
-```
-## 按需引入
-```javascript
-import Vue from 'vue'
-import ElementUI from 'element-ui';
-import {DesignTable, EditTable, ShowTable,Calculation} from './lib'//按需引入
-Vue.use(ElementUI);
-Vue.use(DesignTable);//design(设计)
-Vue.use(EditTable);//edit（填报）
-Vue.use(ShowTable);//show（展示）
-Vue.use(Calculation);//公式
-```
-## 调用 
-```html
-<vue-excel />
-```
-## 也可以 传入参数  
-```html
-<vue-excel :attr_data_conf="{rowCount:20,colCount:8,state:'design'}" />
-```
-```javascript
-attr_data_conf={
-    rowCount:20,//初始化excel行数
-    colCount:8,//初始化excel列数
-    state:'design',//设计状态：design；编辑（填报）状态：edit;展示状态：view
-}
-```
-## 实例
-> template 部分
-```html
 <template>
   <div class="hello">
     <p>
@@ -111,9 +64,8 @@ attr_data_conf={
     <!-- <vue-element-less-excel /> -->
   </div>
 </template>
-```
-> javascript 部分
-```javascript
+
+<script>
 import Excel from '@/lib/components/design/excelReport'
 const defaultLoadIndr = function(node, resolve){
     if (node.level === 0) {
@@ -400,12 +352,9 @@ export default {
     }
   }
 }
-```
-> style部分
-```html
+</script>
+
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 
 </style>
-
-```
