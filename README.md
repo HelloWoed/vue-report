@@ -45,7 +45,7 @@ Vue.use(Calculation);//公式
 
 ## 调用 
 
-> 报表设计 {#design}
+> 报表设计 
 
 ![报表设计效果图](./static/images/design.png)
 
@@ -362,7 +362,7 @@ export default {
 }
 ```
 
-> 报表填报 {#fill}
+> 报表填报 
 
 ![报表填报效果图](./static/images/fill.png)
 
@@ -521,7 +521,7 @@ export default {
 }
 ```
 
-> 报表展示 {#show}
+> 报表展示 
 
 ![报表展示效果图](./static/images/show.png)
 
@@ -620,7 +620,7 @@ export default {
 }
 ```
 
-> 公式编辑器 {#calculation}
+> 公式编辑器 
 
 ![公式编辑效果图](./static/images/calc.png)
 
