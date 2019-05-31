@@ -18,7 +18,7 @@
                 <template slot="title">
                     <strong>输入方式</strong>
                 </template>
-                <inputType />
+                <inputType :currentActiveCell="currentActiveCell" />
             </el-collapse-item>
         </el-collapse>
     </div>
@@ -28,6 +28,11 @@ import bindIndicator from './bindIndicator'
 import inputType from './inputType'
 import inputContentType from './inputContentType'
 export default {
+    props:{
+        currentActiveCell:{type:Object,default(){
+            return null;
+        }}
+    },
     data(){
         return {
             activeNames:['3']

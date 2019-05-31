@@ -5,7 +5,7 @@
         </el-input>
         <p v-if="treeOption.length > 0">
             <el-row v-for="(item,i) in treeOption" :key="i">
-                <el-radio v-model="treeOptionVal" class="radioCheckitem" @change="treeOptionValChange(item)" :label="item.id">{{item.name}}</el-radio>
+                <el-radio v-model="treeOptionVal" class="radioCheckitem" @click.native="clearDefaultEvt($event)" @change="treeOptionValChange(item)" :label="item.id">{{item.name}}</el-radio>
             </el-row>
         </p>
         <p class="noData" v-else>
@@ -27,6 +27,9 @@ export default {
         this.getTreeOption();
     },
     methods:{
+        clearDefaultEvt(e){
+            e.stopPropagation();
+        },
         filterTreeOption(){
             this.treeOption = this.treeOptionCopy.filter(option => {
                 return option.name.indexOf(this.selSearchVal) != -1;

@@ -1,7 +1,7 @@
 <template>
     <div class="inputContentType">
         <el-row>
-             <el-radio v-model="typeValue" label="text" @change="inputContentTypeChange">文本</el-radio>
+             <el-radio v-model="typeValue" label="text" @click.native="clearDefaultEvt($event)" @change="inputContentTypeChange">文本</el-radio>
              <p v-if="typeValue == 'text'">
                 <span>最多允许输入长度</span>
                 <span>
@@ -11,12 +11,12 @@
              </p>
         </el-row>
         <el-row>
-            <el-radio v-model="typeValue" label="number" @change="inputContentTypeChange">数字</el-radio>
+            <el-radio v-model="typeValue" label="number" @click.native="clearDefaultEvt($event)" @change="inputContentTypeChange">数字</el-radio>
             <div v-if="typeValue == 'number'">
                 <p>
                     <span>值类型：</span>
-                    <el-radio v-model="numberType.type" label="int" @change="inputContentTypeChange">整数</el-radio>
-                    <el-radio v-model="numberType.type" label="float" @change="inputContentTypeChange">小数</el-radio>
+                    <el-radio v-model="numberType.type" label="int" @click.native="clearDefaultEvt($event)" @change="inputContentTypeChange">整数</el-radio>
+                    <el-radio v-model="numberType.type" label="float" @click.native="clearDefaultEvt($event)" @change="inputContentTypeChange">小数</el-radio>
                 </p>
                 <p>
                     <span>最小值：</span>
@@ -38,12 +38,14 @@
                         </span>
                     </p>
                     <p>
-                        <el-checkbox v-model="numberType.autoFloatLength" @change="inputContentTypeChange">是否自动补齐小数位数</el-checkbox>
+                        <el-checkbox @click.native="clearDefaultEvt($event)" v-model="numberType.autoFloatLength" @change="inputContentTypeChange">是否自动补齐小数位数</el-checkbox>
                     </p>
                 </div>
             </div>
-             
         </el-row>
+        <div class="subBtn">
+            <el-button type="primary" size="mini" :disabled="!result" @click="submitData">保 存</el-button>
+        </div>
     </div>
 </template>
 <script>
@@ -51,7 +53,7 @@ export default {
     name:'excel-input-content-type',
     data(){
         return {
-            result:{},
+            result:null,
             typeValue:null,
             stringType:{
                 maxlength:null
@@ -65,8 +67,14 @@ export default {
     },
     inject:["cellInputContentSet","getCurrentActiveCell"],
     methods:{
+        clearDefaultEvt(e){
+            e.stopPropagation();
+        },
+        submitData(){
+            this.cellInputContentSet(this.getCurrentActiveCell(),this.result);
+        },
         inputHandle(val){
-            console.log(val)
+            // console.log(val)
         },
         inputContentTypeChange(){
             this.result = {
@@ -83,7 +91,6 @@ export default {
                     this.result.auto_float_length = this.numberType.autoFloatLength;
                 }
             }
-            this.cellInputContentSet(this.getCurrentActiveCell(),this.result);
         }
     }
 }
@@ -91,5 +98,8 @@ export default {
 <style lang="less" scoped>
     .input{
         width:40%;
+    }
+    .subBtn{
+        text-align: center;
     }
 </style>

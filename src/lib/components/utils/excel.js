@@ -53,7 +53,7 @@ const getColTpl = function(type){
         cell_render_type:'text',//单元格默认为text
         cell_type:type,
         cell_id:getId(),
-        cell_style:{}
+        cell_style:{width:'200px'}
     }
 }
 export {getColTpl}
@@ -71,11 +71,14 @@ export function initTableData(rowCount,colCount){
             let colTpl = null;
             if(i == 0 && j == 0){
                 colTpl = getColTpl('cell-col-row-header');
+                colTpl.cell_style.width = '60px';
+                colTpl.cell_style.background = '#fff';
             }else{
                 if(i == 0){
                     colTpl = getColTpl('cell-col-header');
                 }else if( j == 0){
                     colTpl = getColTpl('cell-row-header');
+                    colTpl.cell_style.width = '60px'
                 }else{
                     colTpl = getColTpl();
                 }
@@ -157,7 +160,7 @@ export function deleteCol(){
  * @param {*} num 
  */
 export function insertRow(num){
-    this.attrDataConf.rowCount += num;
+    this.attrDataConf.rowCount = this.attrDataConf.rowCount - 0 + num - 0;
     let {tableData} = this;
     let target = this.borderConf.startTarget;
     let tarAttr = getAttrs(target);
@@ -165,8 +168,7 @@ export function insertRow(num){
     insertData.forEach(rowData => {
         tableData.splice(tarAttr.row,0,rowData);
     })
-    this.$set(this,'tableData',tableData);
-    this.$refs.eborder.$emit('updateBorder');
+    this.setTableData(tableData);
 }
 /**
  * 插入列
@@ -176,7 +178,7 @@ export function insertCol(num){
     let {tableData} = this;
     let target = this.borderConf.startTarget;
     let tarAttr = getAttrs(target);
-    this.attrDataConf.colCount += num;
+    this.attrDataConf.colCount = this.attrDataConf.colCount - 0 + num - 0;
     let tableHeaderData = getBaseColTitle(this.attrDataConf.colCount);
     this.$set(this,'tableHeaderData',tableHeaderData);
     tableData.forEach((row,r) => {
@@ -188,8 +190,7 @@ export function insertCol(num){
             }
         }
     });
-    this.$set(this,'tableData',tableData);
-    this.$refs.eborder.$emit('updateBorder');
+    this.setTableData(tableData);
 }
 /**
  * 指标默认数据

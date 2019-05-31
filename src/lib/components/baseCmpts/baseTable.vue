@@ -370,6 +370,7 @@ export default {
             })
             Object.assign(this.borderConf, {startTarget: downtarget, endTarget: downtarget});
             mouseMoveUp((moveEvt)=>{
+                moveEvt.stopPropagation();
                 let target = moveEvt.target;
                 if(target.nodeName == 'TD' || (target.getAttribute('class') && target.getAttribute('class') == 'td_cell')){
                     while(target.nodeName != "TD"){

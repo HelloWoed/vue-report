@@ -2,7 +2,7 @@
     <div class="inputType">
         <el-row>
             <el-col v-for="(item,i) in typeData" :key="i">
-                <el-radio v-model="typeValue" :label="item.label" @change="inputTypeChange(item)">{{item.text}}</el-radio>
+                <el-radio v-model="typeValue" :label="item.label" @click.native="clearDefaultEvt($event)" @change="inputTypeChange(item)">{{item.text}}</el-radio>
             </el-col>
         </el-row>
         <p v-if="typeSelData.config" style="textAlign:center">
@@ -29,6 +29,18 @@ import TreeConf from './treeConf'
 import SelectionConf from './selectionConf'
 export default {
     name:'excel-input-type',
+    props:{
+        currentActiveCell:{type:Object,default(){
+            return null;
+        }}
+    },
+    watch:{
+        currentActiveCell:{
+            handler(newVal,oldVal){
+                this.typeValue = newVal.cell_render_type;
+            },deep:true
+        }
+    },
     data(){
         return {
             confVisible:false,
@@ -65,19 +77,31 @@ export default {
         }
     },
     components:{TreeConf,SelectionConf},
-    inject:["inputTypeConfChange","getCurrentActiveCell"],
+    inject:["inputTypeConfChange","getCurrentActiveCell","getTableData","setTableData"],
     mounted(){
-
+        
     },
     methods:{
+        clearDefaultEvt(e){
+            e.stopPropagation();
+        },
         inputTypeConfResVal(val){
             this.inputTypeConfChangeData = {
                 type:this.typeSelData,
                 options:val
             };
         },
-        submitInputTypeConf(){
+        setCellInputType(){
+            let tableData = this.getTableData();
+            let cell = this.getCurrentActiveCell();
+            let data = this.inputTypeConfChangeData;
+            tableData[cell.row_index][cell.col_index].cell_render_type = data.type.label;
+            if(data.options)tableData[cell.row_index][cell.col_index].cell_options = data.options;
+            this.setTableData(tableData);
             this.inputTypeConfChange(this.getCurrentActiveCell(),this.inputTypeConfChangeData);
+        },
+        submitInputTypeConf(){
+            this.setCellInputType();
             this.confVisible = false;
         },
         optionConf(){
@@ -86,9 +110,10 @@ export default {
         inputTypeChange(data){
             this.typeSelData = data;
             if(!data.config){
-                this.inputTypeConfChange(this.getCurrentActiveCell(),{
+                this.$set(this,'inputTypeConfChangeData',{
                     type:data
                 });
+                this.setCellInputType();
             }
         }
     }

@@ -1,5 +1,5 @@
 <template>
-<div v-if="target">
+<div v-if="target" class="resizerActive">
   <div :class="[`ve-resizer`, vertical ? 'vertical' : 'horizontal']"
     :style="style"
     @mousedown.left="mousedownHandler($event)"
@@ -40,6 +40,7 @@ export default {
       mouseMoveUp(this.mousemoveHandler, this.mouseupHandler)
     },
     mousemoveHandler (evt) {
+      evt.stopPropagation();
       const { startEvent, vertical, $refs } = this
       if (startEvent !== null && evt.buttons === 1) {
         if (vertical) {
@@ -66,7 +67,10 @@ export default {
     },
     styleObject (target) {
       const { vertical } = this
-      const { offsetLeft, offsetTop, offsetHeight, offsetWidth } = target
+      let { offsetLeft, offsetTop, offsetHeight, offsetWidth } = target
+      if(target.getAttribute('class').includes('fixed_right_cell ')){
+        offsetLeft += this.$parent.$refs.rightFixedTable.offsetLeft;
+      }
       return {
         left: `${vertical ? offsetLeft + offsetWidth - 5 : offsetLeft}px`,
         top: `${vertical ? offsetTop : offsetTop + offsetHeight - 5}px`,
@@ -76,7 +80,10 @@ export default {
     },
     lineStyleObject (target) {
       const { vertical } = this
-      const { offsetLeft, offsetTop, offsetHeight, offsetWidth, parentNode } = target
+      let { offsetLeft, offsetTop, offsetHeight, offsetWidth, parentNode } = target;
+      if(target.getAttribute('class').includes('fixed_right_cell ')){
+        offsetLeft += this.$parent.$refs.rightFixedTable.offsetLeft;
+      }
       return {
         left: `${vertical ? offsetLeft + offsetWidth : offsetLeft}px`,
         top: `${vertical ? offsetTop : offsetTop + offsetHeight}px`,
@@ -94,6 +101,8 @@ export default {
 <style lang="less" scoped>
     .ve-resizer {
         position: absolute;
+        z-index: 1000;
+        color: blue;
         &.horizontal {
             cursor: row-resize;
         }
@@ -103,7 +112,7 @@ export default {
     }
     .ve-resizer-line {
         position: absolute;
-        z-index: 100;
+        z-index: 1500;
         &.horizontal {
             border-bottom: 2px dashed rgb(75, 137, 255);
         }

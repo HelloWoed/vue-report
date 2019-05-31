@@ -1,9 +1,9 @@
 <template>
     <span :class="{'td-cell': cindex !=0 }">
-        <span :class="{'td-cell': cindex !=0 }" :style="cellData.cell_style" v-if="cellData.cell_render_type=='text'">
+        <span :class="{'td-cell': cindex !=0 }" v-if="cellData.cell_render_type=='text'">
             {{cellData.cell_type == 'cell' ? cellData.cell_value : rindex}}
         </span>
-        <span :class="{'td-cell': cindex !=0 }" :style="cellData.cell_style" v-else-if="cellData.cell_render_type=='radio'">
+        <span :class="{'td-cell': cindex !=0 }" v-else-if="cellData.cell_render_type=='radio'">
             <el-select v-model="cellData.cell_value" placeholder="请选择" size="mini">
                 <el-option
                 v-for="item in cellData.cell_options"
@@ -13,7 +13,7 @@
                 </el-option>
             </el-select>
         </span>
-        <span :class="{'td-cell': cindex !=0 }" :style="cellData.cell_style" v-else-if="cellData.cell_render_type=='checkbox'">
+        <span :class="{'td-cell': cindex !=0 }" v-else-if="cellData.cell_render_type=='checkbox'">
             <el-select v-model="cellData.cell_value" multiple placeholder="请选择" size="mini">
                 <el-option
                 v-for="item in cellData.cell_options"
@@ -23,7 +23,7 @@
                 </el-option>
             </el-select>
         </span>
-        <span :class="{'td-cell': cindex !=0 }" :style="cellData.cell_style" v-else-if="cellData.cell_render_type=='tree'">
+        <span :class="{'td-cell': cindex !=0 }" v-else-if="cellData.cell_render_type=='tree'">
             <el-popover
             popper-class="cell-tree-prop"
             placement="right"
@@ -57,8 +57,13 @@
             
             </el-popover>
         </span>
-        <span :class="{'td-cell': cindex !=0 }" :style="cellData.cell_style" v-else-if="cellData.cell_render_type=='fixed'">
-            {{cellData.cell_type == 'cell' ? cellData.cell_value : rindex}}
+        <span :class="{'td-cell': cindex !=0 }" v-else-if="cellData.cell_render_type=='fixed'">
+            <template v-if="!cellData.cell_value">
+                <span class="fixed-cell">固定值单元格不可为空</span>
+            </template>
+            <template v-else>
+                {{cellData.cell_type == 'cell' ? cellData.cell_value : rindex}}
+            </template>
         </span>
     </span>
 </template>
@@ -110,5 +115,31 @@ export default {
         word-break: break-all;
         // text-overflow: ellipsis;
         // overflow: hidden;
+    }
+    @keyframes fixedCellColor {
+        0%{
+            color:#409EFF;
+            // opacity: 0;
+            // font-size: 1rem;
+        }
+        25%{
+            color:#F56C6C;
+            // opacity: 1;
+            // font-size: 1.1rem;
+        }
+        50%{
+            color:#E6A23C;
+            // opacity: 1;
+            // font-size: 1rem;
+        }
+        100%{
+            color:#F56C6C;
+            // opacity: 0;
+            // font-size: 1.1rem;
+        }
+    }
+    .fixed-cell{
+        display: inline-block;
+        animation: fixedCellColor 1s infinite linear;
     }
 </style>

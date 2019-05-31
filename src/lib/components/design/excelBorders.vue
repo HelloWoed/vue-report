@@ -69,14 +69,18 @@ export default {
         updateBorders(){
             window.setTimeout(()=>{
                 this.setBorderStyle();
-                let attrs = getAttrs(this.borderConf.startTarget);
+                let attrs = null;
+                if(this.borderConf.attrs){
+                    attrs = this.borderConf.attrs;
+                }else{
+                    attrs = getAttrs(this.borderConf.startTarget);
+                }
                 let newpaintDashData = JSON.parse(JSON.stringify(this.paintDash));
                 newpaintDashData.attrs = attrs;
                 this.setPaintDash(newpaintDashData);
             },0);
         },
         renderPaint(){
-            console.log('render paint');
             let {paintInfo,attrs} = this.paintDash;
             this.paint = paintInfo;
             this.$set(
@@ -90,6 +94,7 @@ export default {
             if(!this.cornerEvent)return false;
             let _this = this;
             mouseMoveUp((moveEvt)=>{
+                moveEvt.stopPropagation();
                 let {target} = moveEvt;
                 while(target && target.nodeName != "TD"){
                     target = target.parentNode;
@@ -114,6 +119,27 @@ export default {
                     minCol,
                     maxCol
                 }
+                let eventStartTarArrs = this.$parent.$refs[`cell_fixed_${startTarAttr.row}_${startTarAttr.col}`];
+                let eventEndTarArrs = this.$parent.$refs[`cell_fixed_${endTarAttr.row}_${endTarAttr.col}`];
+                let eventStartTar = null;
+                let eventEndTar = null;
+                if(eventStartTarArrs && eventStartTarArrs[eventStartTarArrs.length - 1]){
+                    eventStartTar = eventStartTarArrs[eventStartTarArrs.length - 1];
+                    let eventStarrtTargetAttr = getAttrs(eventStartTar);
+                    if(target.getAttribute('class').includes('cell fixed_right_cell')){
+                        eventStarrtTargetAttr.left += this.$parent.$refs.rightFixedTable.offsetLeft;
+                    }
+                    startTarAttr.left = eventStarrtTargetAttr.left;
+                }
+                if(eventEndTarArrs && eventEndTarArrs[eventEndTarArrs.length - 1]){
+                    eventEndTar = eventEndTarArrs[eventEndTarArrs.length - 1];
+                    let eventEndTargetAttr = getAttrs(eventEndTar);
+                    if(target.getAttribute('class').includes('cell fixed_right_cell')){
+                        eventEndTargetAttr.left += this.$parent.$refs.rightFixedTable.offsetLeft;
+                    }
+                    endTarAttr.left = eventEndTargetAttr.left;
+                }
+                
                 let attrs = {
                     height:endTarAttr.top - startTarAttr.top + endTarAttr.height,
                     width:endTarAttr.left - startTarAttr.left + endTarAttr.width,
@@ -209,7 +235,12 @@ export default {
         //     }
         // },
         setBorderStyle(){
-            const attrs = getAttrs(this.borderConf.startTarget);
+            let attrs = null;
+            if(this.borderConf.attrs){
+                attrs = this.borderConf.attrs;
+            }else{
+                attrs = getAttrs(this.borderConf.startTarget);
+            }
             Object.assign(this.borderConf, {...attrs});
             this.$set(
                 this.borderConf,
@@ -236,6 +267,9 @@ export default {
                 'cornerStyle',
                 {background: this.color, left: `${this.borderConf.left + this.borderConf.width - 5}px`, top: `${this.borderConf.top + this.borderConf.height - 5}px`}
             )
+            if(this.borderConf.attrs){
+                delete this.borderConf.attrs
+            }
         }
     },
     destroyed () {
@@ -253,7 +287,7 @@ export default {
             position: absolute;
             font-size: 0;
             pointer-events: none;
-            z-index: 200;
+            z-index: 450;
         }
 
         .corner {
@@ -264,13 +298,14 @@ export default {
             position: absolute;
             bottom: -6px;
             right: -6px;
-            z-index: 300;
+            z-index: 450;
         }
         .cornerHover{
             cursor: crosshair;
         }
         .ve-paint-border {
             position: absolute;
+            z-index:400;
             pointer-events: none;
             border: 1px dashed rgb(75, 137, 255);
             background: rgba(75, 137, 255, .2);

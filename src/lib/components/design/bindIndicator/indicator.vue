@@ -26,10 +26,10 @@
                                     @input="filterDimensionlityChange" 
                                     suffix-icon="el-icon-search"
                                     clearable></el-input>   
-                                <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" class="radioCheckitem" @change="handleCheckAllChange">全选</el-checkbox>
+                                <el-checkbox @click.native="clearDefaultEvt($event)" :indeterminate="isIndeterminate" v-model="checkAll" class="radioCheckitem" @change="handleCheckAllChange">全选</el-checkbox>
                                 <el-checkbox-group v-model="dimensionlityChecked" @change="seldimensionlityValChange">
                                     <el-row v-for="(item,i) in dimensionlityData" :key="i">
-                                        <el-checkbox :label="item.id" class="radioCheckitem">{{item.value}}</el-checkbox>
+                                        <el-checkbox @click.native="clearDefaultEvt($event)" :label="item.id" class="radioCheckitem">{{item.value}}</el-checkbox>
                                     </el-row>
                                 </el-checkbox-group>
                             </p>
@@ -53,7 +53,7 @@
                             <div class="content">
                             <p>
                                 <el-row v-for="(item,i) in indicatorData" :key="i">
-                                    <el-radio v-model="selIndicatorVal" class="radioCheckitem" @change="selIndicatorValChange(item)" :label="item.id">{{item.value}}</el-radio>
+                                    <el-radio v-model="selIndicatorVal" class="radioCheckitem" @change="selIndicatorValChange(item)" @click.native="clearDefaultEvt($event)" :label="item.id">{{item.value}}</el-radio>
                                 </el-row>
                             </p>
                         </div>
@@ -86,18 +86,6 @@ export default {
     name:'excel-indr',
     data(){
         return {
-            indrPprops:{
-                label: 'name',
-                // children: 'zones',
-                disabled:(data,node)=>{
-                    if(node.level > 3)return false;
-                    else return true;
-                },
-                isLeaf: (data,node)=>{
-                    if(node.level > 3)return true;
-                    else return data.leaf;
-                }
-            },
             treeResVal:null,//指标树的最终结果值
             getIndicatorVal:null,
             indicatorListVal:null,
@@ -113,11 +101,14 @@ export default {
             filterDimensionlity:null,
         }
     },
-    inject:["loadIndrNode","indrSelectChange","dimensionData","getIndrDatas"],
+    inject:["loadIndrNode","indrPprops","indrSelectChange","dimensionData","getIndrDatas"],
     mounted(){
         
     },
     methods:{
+        clearDefaultEvt(e){
+            e.stopPropagation();
+        },
         filterNodeHandle(){
             this.$refs.indicatorTree.filter(this.getIndicatorVal);
         },

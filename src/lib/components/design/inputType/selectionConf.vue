@@ -21,10 +21,10 @@
             <el-col :span="12">
                 <el-divider><strong>选择项</strong></el-divider>
                 <p v-if="selectionData.length > 0">
-                    <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" class="radioCheckitem" @change="handleCheckAllChange">全选</el-checkbox>
+                    <el-checkbox @click.native="clearDefaultEvt($event)" :indeterminate="isIndeterminate" v-model="checkAll" class="radioCheckitem" @change="handleCheckAllChange">全选</el-checkbox>
                     <el-checkbox-group v-model="checkedOptions" @change="selOptionValChange">
                         <el-row v-for="(option,i) in selectionData" :key="i">
-                            <el-checkbox :label="option" class="radioCheckitem">{{option.name}}</el-checkbox>
+                            <el-checkbox @click.native="clearDefaultEvt($event)" :label="option" class="radioCheckitem">{{option.name}}</el-checkbox>
                         </el-row>
                     </el-checkbox-group>
                 </p>
@@ -57,6 +57,9 @@ export default {
     },
     inject:["confSelectionData","confSelectionItemData"],
     methods:{
+        clearDefaultEvt(e){
+            e.stopPropagation();
+        },
         getSelListData(){
             syncMethod(this.confSelectionData).then((data)=>{
                 this.selectionListData = data;

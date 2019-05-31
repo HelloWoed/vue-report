@@ -26,10 +26,10 @@
                                 suffix-icon="el-icon-search"
                                 clearable></el-input>   
                             <p v-if="dimensionlityData.length > 0">
-                                <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" class="radioCheckitem" @change="handleCheckAllChange">全选</el-checkbox>
+                                <el-checkbox @click.native="clearDefaultEvt($event)" :indeterminate="isIndeterminate" v-model="checkAll" class="radioCheckitem" @change="handleCheckAllChange">全选</el-checkbox>
                                 <el-checkbox-group v-model="dimensionlityChecked" @change="seldimensionlityValChange">
                                     <el-row v-for="(item,i) in dimensionlityData" :key="i">
-                                        <el-checkbox :label="item.id" class="radioCheckitem">{{item.value}}</el-checkbox>
+                                        <el-checkbox @click.native="clearDefaultEvt($event)" :label="item.id" class="radioCheckitem">{{item.value}}</el-checkbox>
                                     </el-row>
                                 </el-checkbox-group>
                             </p>
@@ -52,11 +52,11 @@
                     <div v-if="indicatorData.length > 0">
                             <div class="content">
                             <p>
-                                <el-checkbox :indeterminate="isIndeterminateIndr" class="radioCheckitem" v-model="checkAllIndr" @change="handleCheckAllIndrChange">全选</el-checkbox>
+                                <el-checkbox @click.native="clearDefaultEvt($event)" :indeterminate="isIndeterminateIndr" class="radioCheckitem" v-model="checkAllIndr" @change="handleCheckAllIndrChange">全选</el-checkbox>
                                 <!-- <div style="margin: 15px 0;"></div> -->
                                 <el-checkbox-group v-model="checkedIndrs" @change="selIndicatorValChange">
                                     <el-row v-for="(item,i) in indicatorData" :key="i">
-                                        <el-checkbox :label="item" class="radioCheckitem">{{item.value}}</el-checkbox>
+                                        <el-checkbox @click.native="clearDefaultEvt($event)" :label="item" class="radioCheckitem">{{item.value}}</el-checkbox>
                                         <!-- <el-radio v-model="selIndicatorVal" class="radioCheckitem" @change="selIndicatorValChange(item)" :label="item.id">{{item.value}}</el-radio> -->
                                     </el-row>
                                 </el-checkbox-group>
@@ -129,6 +129,9 @@ export default {
         
     },
     methods:{
+        clearDefaultEvt(e){
+            e.stopPropagation();
+        },
         filterNodeHandle(){
             this.$refs.indicatorTree.filter(this.getIndicatorVal);
         },

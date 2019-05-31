@@ -6,6 +6,7 @@
                 <el-tooltip v-else effect="light" :content="item.tips" placement="bottom">
                     <span v-if="item.target == 'tableInit'">
                         <el-popover
+                            ref="tableInit"
                             placement="bottom"
                             width="400"
                             trigger="click">
@@ -17,7 +18,47 @@
                                         <el-input type="number" placeholder="请输入" v-model="tableInitRowCol.col"></el-input>
                                     </el-form-item>
                                     <el-form-item>
-                                        <el-button type="primary" @click="initTable('initTableRowCol')">提交</el-button>
+                                        <el-button type="primary" @click="initTable('initTableRowCol')">提 交</el-button>
+                                    </el-form-item>
+                                </el-form>
+                            <span slot="reference" :class="item.className"></span>
+                        </el-popover>
+                    </span>
+                    <span v-else-if="item.target == 'tableRowCol'">
+                        <el-popover
+                            ref="tableRowCol"
+                            placement="bottom"
+                            width="400"
+                            trigger="click">
+                                <el-form :label-position="labelPosition" :ref="`${item.target}_${item.name}`" label-width="80px">
+                                   <el-form-item :label="item.tips">
+                                        <el-input type="number" :min="0" :step="0.5" placeholder="请输入" v-model="item.value"></el-input>
+                                    </el-form-item>
+                                    <el-form-item>
+                                        <el-button type="primary" size="mini" @click="setTableHeightWidth(item)">确 定</el-button>
+                                    </el-form-item>
+                                </el-form>
+                            <span slot="reference" :class="item.className"></span>
+                        </el-popover>
+                    </span>
+                    <span v-else-if="item.target == 'tableLock'">
+                        <el-popover
+                            ref="tableRowCol"
+                            placement="bottom"
+                            width="400"
+                            trigger="click">
+                                <el-form :label-position="labelPosition" :ref="`${item.target}_${item.name}`" label-width="100px">
+                                   <el-form-item :label="'锁定首行数'">
+                                        <el-input type="number" :min="0" :step="1" placeholder="请输入" v-model="item.value.firstRow"></el-input>
+                                    </el-form-item>
+                                   <el-form-item :label="'锁定首列数'">
+                                        <el-input type="number" :min="0" :step="1" placeholder="请输入" v-model="item.value.leftCol"></el-input>
+                                    </el-form-item>
+                                   <el-form-item :label="'锁定尾列数'">
+                                        <el-input type="number" :min="0" :step="1" placeholder="请输入" v-model="item.value.rightCol"></el-input>
+                                    </el-form-item>
+                                    <el-form-item>
+                                        <el-button type="primary" size="mini" @click="lockedTable(item)">确 定</el-button>
                                     </el-form-item>
                                 </el-form>
                             <span slot="reference" :class="item.className"></span>
@@ -127,14 +168,14 @@ export default {
                 {target:'cell',tips:'左对齐',className:['icon','iconfont','iconzuoduiqi'],spanVal:0.5,renderType:'icon',name:'textLeft',value:{textAlign:'left'}},
                 {target:'cell',tips:'左右居中',className:['icon','iconfont','iconformat-horizontal-align-center'],spanVal:0.5,renderType:'icon',name:'textCenter',value:{textAlign:'center'}},
                 {target:'cell',tips:'右对齐',className:['icon','iconfont','iconyouduiqi'],spanVal:0.5,renderType:'icon',name:'textRight',value:{textAlign:'right'}},
-                {tips:'高度',className:['icon','iconfont','icongaodu'],spanVal:0.5,name:'setHeight',renderType:'icon'},
-                {tips:'宽度',className:['icon','iconfont','iconkuandu'],spanVal:0.5,name:'setWidth',renderType:'icon'},
+                {target:'tableRowCol',tips:'高度',className:['icon','iconfont','icongaodu'],spanVal:0.5,name:'setHeight',renderType:'icon',value:'22'},
+                {target:'tableRowCol',tips:'宽度',className:['icon','iconfont','iconkuandu'],spanVal:0.5,name:'setWidth',renderType:'icon',value:'200'},
                 {target:'cell',tips:'上对齐',className:['icon','iconfont','iconshangduiqi'],spanVal:0.5,renderType:'icon',name:'textTop',value:{verticalAlign:'top'}},
                 {target:'cell',tips:'上下居中',className:['icon','iconfont','iconformat-vertical-align-center'],spanVal:0.5,renderType:'icon',name:'vercicalMiddle',value:{verticalAlign:'middle'}},
                 {target:'cell',tips:'下对齐',className:['icon','iconfont','iconxiaduiqi'],spanVal:0.5,renderType:'icon',name:'textBottom',value:{verticalAlign:'bottom'}},
                 // {className:['split-line'],spanVal:0.5,renderType:'split',name:'split'},
-                {target:'table',eName:'locked',tips:'锁定',className:['icon','iconfont','iconlock-line'],name:'locked',spanVal:0.5,renderType:'icon'},
-                {target:'table',eName:'unlock',tips:'解锁',className:['icon','iconfont','iconlock-unlock-line'],name:'unlock',spanVal:0.5,renderType:'icon'},
+                {target:'tableLock',eName:'locked',tips:'锁定',className:['icon','iconfont','iconlock-line'],name:'locked',spanVal:0.5,renderType:'icon',value:{firstRow:null,leftCol:null,rightCol:null}},
+                {target:'tableLock',eName:'unlock',tips:'解锁',className:['icon','iconfont','iconlock-unlock-line'],name:'unlock',spanVal:0.5,renderType:'icon',value:{firstRow:null,leftCol:null,rightCol:null}},
                 {target:'table',eName:'tablesetting',tips:'表格设置',className:['icon','iconfont','iconsetting'],name:'tablesetting',spanVal:0.5,renderType:'icon'},
                 {target:'table',eName:'upload',tips:'上传',className:['icon','iconfont','iconshangchuan'],name:'upload',spanVal:0.5,renderType:'icon'},
                 {className:['split-line'],spanVal:2,renderType:'split',name:'splitMiddle'},
@@ -151,10 +192,24 @@ export default {
             if(item.target == 'cell')this.$emit('setAttribute',item);
             else if(item.target == 'table') this.$emit('tableEventHandler',item);
         },
+        setTableHeightWidth(item){
+            item.value = item.value - 0 + 'px';
+            this.$emit('setAttribute',item);
+            this.$refs.tableRowCol.forEach(vm =>{
+                vm.doClose();
+            })
+        },
+        lockedTable(item){
+            this.$emit('lockedTableDo',item);
+            this.$refs.tableRowCol.forEach(vm =>{
+                vm.doClose();
+            })
+        },
         initTable(tableRef){
             this.$refs[tableRef][0].validate(valid=>{
                 if(valid){
-                    this.$emit('initTableRowCol',this.tableInitRowCol)
+                    this.$emit('initTableRowCol',this.tableInitRowCol);
+                    this.$refs.tableInit[0].doClose();
                 }
             })
         }
@@ -170,8 +225,8 @@ export default {
 <style lang="less" scoped>
     @import url('../icon/iconfont.css');
     .toll-bar {
-        width: 100%;
-        height: 50px;
+        // width: 90%;
+        // height: 50px;
         line-height: 50px;
         text-align: left;
         padding: 0 60px;

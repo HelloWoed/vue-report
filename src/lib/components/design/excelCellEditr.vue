@@ -52,6 +52,11 @@ export default {
     setEditInfo(){
       if(!this.target.target)return {};
       let attr = getAttrs(this.target.target);
+      if(this.target.target.getAttribute('class').includes('cell fixed_right_cell')){
+        attr.left += this.$parent.$refs.rightFixedTable.offsetLeft;
+      }
+      let eventTarArrs = this.$parent.$refs[`cell_fixed_${attr.row}_${attr.col}`];
+      let eventTarAttr = null;
       this.styles =  {
         top:attr.top + 'px',
         left:attr.left + 'px',
@@ -71,6 +76,7 @@ export default {
 <style lang="less" scoped>
   .cell-edit{
     position: absolute;
+    z-index: 400;
     .input-area{
       width: 100%;
       height: 100%;
