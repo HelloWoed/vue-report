@@ -11,7 +11,7 @@
                 suffix-icon="el-icon-search"></el-input>   
                 <p v-if="selectionListData.length > 0">
                     <el-row v-for="(item,i) in selectionListData" :key="i">
-                        <el-radio v-model="selListVal" class="radioCheckitem" @change="selSelValChange(item)" :label="item.id">{{item.name}}</el-radio>
+                        <el-radio @click.native="clearDefaultEvt($event)" v-model="selListVal" class="radioCheckitem" @change="selSelValChange(item)" :label="item.id">{{parseSelectRadioLabel(item)}}</el-radio>
                     </el-row>
                 </p>
                 <p class="noData" v-else>
@@ -24,7 +24,7 @@
                     <el-checkbox @click.native="clearDefaultEvt($event)" :indeterminate="isIndeterminate" v-model="checkAll" class="radioCheckitem" @change="handleCheckAllChange">全选</el-checkbox>
                     <el-checkbox-group v-model="checkedOptions" @change="selOptionValChange">
                         <el-row v-for="(option,i) in selectionData" :key="i">
-                            <el-checkbox @click.native="clearDefaultEvt($event)" :label="option" class="radioCheckitem">{{option.name}}</el-checkbox>
+                            <el-checkbox @click.native="clearDefaultEvt($event)" :label="option" class="radioCheckitem">{{parseSelectCheckBoxLabel(option)}}</el-checkbox>
                         </el-row>
                     </el-checkbox-group>
                 </p>
@@ -39,7 +39,14 @@
 import {syncMethod} from '../../utils/excel'
 export default {
     data(){
+        let _this = this;
         return {
+            parseSelectRadioLabel:(item)=>{
+               return  _this.selectionRadioProp.bind(_this)(item)
+            },
+            parseSelectCheckBoxLabel:(item)=>{
+               return  _this.selectionCheckBoxProp.bind(_this)(item)
+            },
             selectionListData:[],
             selectionListDataCopy:[],
             selectionData:[],
@@ -55,7 +62,7 @@ export default {
     mounted(){
         this.getSelListData();
     },
-    inject:["confSelectionData","confSelectionItemData"],
+    inject:["confSelectionData","confSelectionItemData","selectionRadioProp","selectionCheckBoxProp"],
     methods:{
         clearDefaultEvt(e){
             e.stopPropagation();
@@ -74,7 +81,7 @@ export default {
         },
         selSelValChange(data){
             this.checkAll = false;
-            this.checkedOptions = null;
+            this.checkedOptions = [];
             syncMethod(this.confSelectionItemData,data).then(data=>{
                 this.selectionData = data;
             }); 

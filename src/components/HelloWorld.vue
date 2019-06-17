@@ -17,6 +17,8 @@
       :cellBindIndr="cellBindIndr"
       :treeLoadNode="treeLoadNode"
       :treeProps="treeProps"
+      :dimensionData="calculationConf.dimensionData"
+      :getIndrDatas="calculationConf.getIndrDatas"
       :treeSelectedResChange="treeSelectedResChange"
       :cellProps="cellProps"
       :clearTreeSelected="clearTreeSelected"
@@ -97,7 +99,7 @@ export default {
         fixedHeaderCount:0,//头部固定行数
         fixedLeftCount:0,//左边列固定列数 需要设置width
         fixedRightCount:0,//右边列固定列数 需要设置width
-        tableData:[[{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell-col-row-header","cell_id":"a167a11e0a704ca19e2a5bc08bcfe2fc","cell_style":{"width":"60px","background":"#fff"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell-col-header","cell_id":"700c7bc6a50b41a8a4cd10ba946f4dd7","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell-col-header","cell_id":"4b7985ca9cd34036ac56c306ce3e89ad","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell-col-header","cell_id":"c15d9582114e40c1920ad84475e5a366","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell-col-header","cell_id":"dac0ffc2a81f4f8eac74710a4c3330e0","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell-col-header","cell_id":"642f3beb3430461cbcd51bc0cc49a3a1","cell_style":{"width":"200px"}}],[{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell-row-header","cell_id":"e72f15c8ff834dd3abff911d88f1fa07","cell_style":{"width":"60px","height":"35px"}},{"cell_value":"asd","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"2fca08154bb14e15a8fda75635374488","cell_style":{"width":"200px","height":"32px"},"row_index":1,"col_index":1},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"a74ffa50d095440a8927c3c5ddc97ea1","cell_style":{"width":"200px","height":"32px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"50d82e4d3068445fa5d721862737a025","cell_style":{"width":"200px","height":"32px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"567cbe8c42df43258ad365e7cf619a3c","cell_style":{"width":"200px","height":"32px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"208de5a3340640ab8e7a1e5d138c783d","cell_style":{"width":"200px","height":"32px"}}],[{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell-row-header","cell_id":"201405600d50472d88b3fe1717456a08","cell_style":{"width":"60px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"0546b9e701dc4775a9b3417a6d7e5463","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"9b27948bb5af46b39195dd54222766c1","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"58b1a6d293284672a61c25381818065c","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"7b1a1a3db1be4638a74f9fa3618a5cda","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"01030f537b2f4f2b89083d57c63b8d29","cell_style":{"width":"200px"}}],[{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell-row-header","cell_id":"285e974fff334d3980e3809a496746dc","cell_style":{"width":"60px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"f3b78f65f2d54a678245e69e733a445b","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"f33a3412d11d43dbb7fff22adfa37fd5","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"0504a28c7e3e4d73b6aefe1ef46a1a72","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"5ee51b12eba54a398e6602b6a59e545f","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"0fb03f1e33db4488afe703bafeb96ae8","cell_style":{"width":"200px"}}],[{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell-row-header","cell_id":"d96eb987dc9c4f2f9811415fce9c08e6","cell_style":{"width":"60px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"bbab2c3064ee42bcb794969fd6be66cc","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"c87370e9fd8f479ebb4b0f6eee6f971c","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"5a2b89b7faae463bbb930d977a5e240b","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"dacd744655e44f80ba02a757a4e9e981","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"7d5a5e4efcae48778bb3e4f666d8457b","cell_style":{"width":"200px"}}],[{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell-row-header","cell_id":"6ae68af6486947fbb65c9254e6f55bec","cell_style":{"width":"60px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"61f84354350d409dab1586b5bc091cc3","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"e93260615f1d4e818f59fe0fc2cf939f","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"fb58d6eff20344a9b9ed4dd8c3852441","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"cbcb675ba4fb45e79a9767fc6f6a9173","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"930293af5fb948999ccc12c531a996f7","cell_style":{"width":"200px"}}]]
+        tableData:[[{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell-col-row-header","cell_id":"a77670cd0c1e4ff5b55ab13863484aa2","cell_style":{"width":"60px","background":"#fff"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell-col-header","cell_id":"555204fe46db43ebbb1b0fbb0eea871b","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell-col-header","cell_id":"caad020f4e184a5fbde8c6d63ae2eb83","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell-col-header","cell_id":"32faaa17b4b7439397ac693714b6a16e","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell-col-header","cell_id":"75611838ff634d7a8d32ec80770caaa6","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell-col-header","cell_id":"1fa4a9202e8b4f23853b25799d317b75","cell_style":{"width":"200px"}}],[{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell-row-header","cell_id":"16d4201bf9684bb981716f6b4a02e01d","cell_style":{"width":"60px"}},{"cell_value":"qwertyui","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"43cefbbf56f545e5b0ed21019dcf4d9b","cell_style":{"width":"200px","backgroundColor":"rgba(0, 247, 255, 1)"},"row_index":1,"col_index":1},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"94831cac83de430eb3d0b052eabd5116","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"dc8078e5cc6f4158ba17a5ac28f1f0b8","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"c1f3ec4d122e43c8957df0d933ad3727","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"02cd4cf6d83b44229efaeb1526c7af08","cell_style":{"width":"200px"}}],[{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell-row-header","cell_id":"a636d81782084be2b083da2f427af9a4","cell_style":{"width":"60px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"8865964b28324653a8c32524059d1252","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"93eec3f757de4c9e99c9e26a77155e7f","cell_style":{"width":"200px","backgroundColor":"rgba(0, 255, 13, 1)"},"row_index":2,"col_index":2},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"768dc0a6dda947639c8054b507845700","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"18a74b9c57db4133a08d315f5671b2c8","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"f463958487684994a59fbe58bf0aac51","cell_style":{"width":"200px"}}],[{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell-row-header","cell_id":"fdc8b4f053d34a7a89703328c6b9ab3e","cell_style":{"width":"60px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"e26e42c40ef241f58e4074a09f86dbeb","cell_style":{"width":"200px"},"row_index":3,"col_index":1},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"fcc4b8fce40f491685031ff13fca4a62","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"d5af89be811f4390ba02e72b3d8d9643","cell_style":{"width":"200px","backgroundColor":"rgba(0, 55, 255, 1)"},"row_index":3,"col_index":3},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"65a3aca1510d4ddfbadabeb97cf3b36f","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"aac610a117d1436c9fcc4fba26db3f0c","cell_style":{"width":"200px"}}],[{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell-row-header","cell_id":"3a9cfd2c19cd4163895741d91ccb4d8f","cell_style":{"width":"60px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"17d237f492ff453abc0cd5f7a88c58dd","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"67dbacf12c32456bb4a956c38c089ee3","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"933d2b58ade349f8849125937b6884db","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"33d3f02528b847a8b644993986a79388","cell_style":{"width":"200px","backgroundColor":"rgba(255, 200, 0, 1)"},"row_index":4,"col_index":4},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"9690a6796e754d29a07b060fcc1aa85a","cell_style":{"width":"200px"}}],[{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell-row-header","cell_id":"326894b5eb3e402a90a992b28f39aea5","cell_style":{"width":"60px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"47ee2a5639e845c887ee2d7ffa1693c3","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"b5b51e244b7d430dbc38a2a50f537244","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"238e5993fd3440739b00ca9ca97de851","cell_style":{"width":"200px"}},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"d81f506a007d452c9f4f942004a0a733","cell_style":{"width":"200px"},"row_index":5,"col_index":4},{"cell_value":"","cell_rowspan":1,"cell_colspan":1,"cell_area_type":"inputArea","cell_render_type":"text","cell_type":"cell","cell_id":"5e24f3795f854784b061853b665a70ca","cell_style":{"width":"200px","backgroundColor":"rgba(255, 0, 251, 1)"},"row_index":5,"col_index":5}]]
       },
       editTableDataConf:{
         rowCount:15,//行数
@@ -136,153 +138,169 @@ export default {
       },
       calculationConf:{
         indrProp:{
-          value:'id',
-          label:'value'
+          label:(data, node)=>{
+            return data.name
+          },
+          // children: 'zones',
+          disabled:(data,node)=>{
+            if(node.level > 3)return false;
+            else return true;
+          },
+          isLeaf: (data,node)=>{
+            if(node.level > 3)return true;
+            else return data.leaf;
+          }
         },
-        existFuns:[
-          {
-            id:'001',
-            name:'求和',
-            value:'COUNT'
-          },
-          {
-            id:'002',
-            name:'平均值',
-            value:'AVERAGE'
-          },
-          {
-            id:'003',
-            name:'最大值',
-            value:'MAX'
-          },
-          {
-            id:'004',
-            name:'最小值',
-            value:'MIN'
-          }
-        ],
-        symbolData:[
-          {
-            id:'001',
-            type:'symbol',
-            value:"+"
-          },
-          {
-            id:'002',
-            type:'symbol',
-            value:"-"
-          },
-          {
-            id:'003',
-            type:'symbol',
-            value:"*"
-          },
-          {
-            id:'004',
-            type:'symbol',
-            value:"/"
-          },
-          {
-            id:'005',
-            type:'symbol',
-            value:"="
-          },
-          {
-            id:'006',
-            type:'symbol',
-            value:">"
-          },
-          {
-            id:'007',
-            type:'symbol',
-            value:">="
-          },
-          {
-            id:'008',
-            type:'symbol',
-            value:"<"
-          },
-          {
-            id:'009',
-            type:'symbol',
-            value:"<="
-          },
-          {
-            id:'010',
-            type:'symbol',
-            value:"=="
-          },
-          {
-            id:'011',
-            type:'symbol',
-            value:"!="
-          },
-          {
-            id:'012',
-            type:'symbol',
-            value:"("
-          },
-          {
-            id:'013',
-            type:'symbol',
-            value:")"
-          },
-          {
-            id:'014',
-            type:'symbol',
-            value:"["
-          },
-          {
-            id:'015',
-            type:'symbol',
-            value:"]"
-          },
-          {
-            id:'016',
-            type:'symbol',
-            value:"in"
-          },
-          {
-            id:'017',
-            type:'symbol',
-            value:"not in"
-          },
-          {
-            id:'018',
-            type:'symbol',
-            value:"if"
-          },
-          {
-            id:'019',
-            type:'symbol',
-            value:"else"
-          },
-          {
-            id:'020',
-            type:'symbol',
-            value:"and"
-          },
-          {
-            id:'021',
-            type:'symbol',
-            value:"or"
-          },
-          {
-            id:'022',
-            type:'symbol',
-            value:","
-          },
-          {
-            id:'023',
-            type:'symbol',
-            value:"delete"
-          }
-        ],
+        existFuns:(resolve)=>{
+            let data =  [
+                {
+                    id:'001',
+                    name:'求和',
+                    value:'COUNT'
+                },
+                {
+                    id:'002',
+                    name:'平均值',
+                    value:'AVERAGE'
+                },
+                {
+                    id:'003',
+                    name:'最大值',
+                    value:'MAX'
+                },
+                {
+                    id:'004',
+                    name:'最小值',
+                    value:'MIN'
+                },
+                {
+                    id:'005',
+                    name:'混合运算',
+                    value:"hybirdOpration"
+                }
+            ]
+            resolve(data);
+        },
+        symbolData:(resolve)=>{
+            let data =  [
+                {
+                    id:'001',
+                    type:'symbol',
+                    value:"+"
+                },
+                {
+                    id:'002',
+                    type:'symbol',
+                    value:"-"
+                },
+                {
+                    id:'003',
+                    type:'symbol',
+                    value:"*"
+                },
+                {
+                    id:'004',
+                    type:'symbol',
+                    value:"/"
+                },
+                {
+                    id:'005',
+                    type:'symbol',
+                    value:"="
+                },
+                {
+                    id:'006',
+                    type:'symbol',
+                    value:">"
+                },
+                {
+                    id:'007',
+                    type:'symbol',
+                    value:">="
+                },
+                {
+                    id:'008',
+                    type:'symbol',
+                    value:"<"
+                },
+                {
+                    id:'009',
+                    type:'symbol',
+                    value:"<="
+                },
+                {
+                    id:'010',
+                    type:'symbol',
+                    value:"=="
+                },
+                {
+                    id:'011',
+                    type:'symbol',
+                    value:"!="
+                },
+                {
+                    id:'012',
+                    type:'symbol',
+                    value:"("
+                },
+                {
+                    id:'013',
+                    type:'symbol',
+                    value:")"
+                },
+                {
+                    id:'014',
+                    type:'symbol',
+                    value:"["
+                },
+                {
+                    id:'015',
+                    type:'symbol',
+                    value:"]"
+                },
+                {
+                    id:'016',
+                    type:'symbol',
+                    value:"in"
+                },
+                {
+                    id:'017',
+                    type:'symbol',
+                    value:"not in"
+                },
+                {
+                    id:'018',
+                    type:'symbol',
+                    value:"if"
+                },
+                {
+                    id:'019',
+                    type:'symbol',
+                    value:"else"
+                },
+                {
+                    id:'020',
+                    type:'symbol',
+                    value:"and"
+                },
+                {
+                    id:'021',
+                    type:'symbol',
+                    value:"or"
+                },
+                {
+                    id:'023',
+                    type:'symbol',
+                    value:"delete"
+                }
+            ]
+            resolve(data);
+        },
         loadIndrNode(node, resolve){
           defaultLoadIndr(node, resolve);
         },
-        dimensionData(data,node,vm){//维度数据
-          return [
+        dimensionData(resolve,reject,data,node,vm){//维度数据
+          let datas =  [
             {id:'001',value:'维度指标1'},
             {id:'002',value:'维度指标2'},
             {id:'003',value:'维度指标3'},
@@ -290,6 +308,7 @@ export default {
             {id:'005',value:'维度指标5'},
             {id:'006',value:'维度指标6'},
           ]
+          resolve(datas);
         },
         indrSelectChange(data,node,refTree,self){//指标树选择改变时触发
             //用promise是为了如果此处需要拉接口处理数据，在子组件内需要等接口数据处理完成后才能处理
@@ -300,8 +319,8 @@ export default {
                 resolve(data);
             });
         },
-        getIndrDatas(data){//获取指标数据
-          return [
+        getIndrDatas(resolve,reject,data,vm){//获取指标数据
+          let datas =  [
             {id:'001',value:'普通本科生因其他休退学数1'},
             {id:'002',value:'普通本科生因其他休退学数2'},
             {id:'003',value:'普通本科生因其他休退学数3'},
@@ -314,6 +333,7 @@ export default {
             {id:'010',value:'普通本科生因其他休退学数10'},
             {id:'011',value:'普通本科生因其他休退学数11'}
           ]
+          resolve(datas);
         }
       }
     }

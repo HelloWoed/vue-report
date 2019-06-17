@@ -139,7 +139,7 @@
                 </div>
                 <div class="v-body" ref="body">
                     <table class="table table-body" :style="reportBoxstyle">
-                        <tr v-for="(trItem,rindex) in tableData" :key="rindex" v-show="rindex > 0">
+                        <tr v-for="(trItem,rindex) in tableData" :key="rindex">
                             <td v-for="(tdItem,cindex) in trItem" 
                             :key="cindex" 
                             class="cell"
@@ -323,6 +323,7 @@ export default {
         }},
         treeSelectedResChange:{type:Function,default:(treeVm,cellId)=>{}},
         clearTreeSelected:{type:Function,default:(treeVm,cellId)=>{}},
+        cellValidate:{type:Function,default:(resolve,cellData)=>{}},
         cellProps:{type:Object,default(){return {
             radio:{
                 label:'name',
@@ -382,6 +383,7 @@ export default {
             treeSelectedResChange:this.treeSelectedResChange,
             clearTreeSelected:this.clearTreeSelected,
             getCellProps:this.getCellProps,
+            cellValidate:this.cellValidate,
         }
     },
     computed:{
@@ -457,24 +459,42 @@ export default {
         },
         updateTableCellHeight(){
             let {tableData} = this;
-            let r = this.getCurrentActiveCell().row_index;
-            let height = this.$refs[`cell_${r}_1`][0].offsetHeight;
+            let r = null;
+            if(this.getCurrentActiveCell().row_index){
+                r = this.getCurrentActiveCell().row_index;
+            }else{
+                r = this.borderConf.row;
+            }
+            let currenCell = this.getCurrentActiveCell();
+            let calHeight = 0;
+            for(let row = r; row < r + currenCell.cell_rowspan; row++){
+                calHeight += this.$refs[`row_${r}`][0].offsetHeight;
+                tableData[r][0].cell_style.height = this.$refs[`row_${r}`][0].offsetHeight + 'px';
+            };
+            this.$set(this,'currentRowHeight',calHeight);
+            let height = parseInt(currenCell.cell_style.height);
             if(!this.currentRowHeight || (height - this.currentRowHeight > 3)){
                 this.currentRowHeight = height;
+                tableData[r].forEach((cell,c)=>{
+                    cell.cell_style.height = this.currentRowHeight + 'px';
+                    if(c == 0){
+                        cell.cell_style.height = this.currentRowHeight + 3 + 'px';
+                    }
+                });
             }
-            tableData[r].forEach((cell,c)=>{
-                cell.cell_style.height = this.currentRowHeight + 'px';
-                if(c == 0){
-                    cell.cell_style.height = this.currentRowHeight + 3 + 'px';
-                }
-            });
-            
         },
         defaultActiveCell(tdData){
             let tdItem = null;
             let targetCellDom = null;
+            let tableData = this.getTableData();
+            if(tableData.length == 0)return false;
+            if(this.currentActiveCell){
+                if(tableData[this.currentActiveCell.row_index][this.currentActiveCell.col_index] && this.currentActiveCell.cell_id){
+                    return false;
+                }
+            };
             if(!tdData){
-                tdItem = this.tableData[1][1];
+                tdItem = tableData[1][1];
                 tdItem.row_index = 1;
                 tdItem.col_index = 1;
                 targetCellDom = this.$refs.cell_1_1[0];
@@ -484,7 +504,6 @@ export default {
             }
             this.activeTdData = tdItem;
             this.$set(this,'currentActiveCell',tdItem);
-            this.$emit('currentCellChange',tdItem);
             let attr = getAttrs(targetCellDom);
             this.$set(this,'paintDash',{
                 attrs:attr,
@@ -586,22 +605,28 @@ export default {
             });
         },
         cellDblclickHandler(rindex,cindex,tdItem,e){
-            if(tdItem.cell_render_type == 'fixed'){
-                this.$message({
-                    message:'固定值类型的单元格不允许编辑！ @_@',
-                    type:'warning',
-                    duration:5000
-                });
-                return false
-            };
             // let target = e.target;
+            let notAllowArea = ["calcArea","quote"];
+            let notAllowAreaName = {
+                calcArea:"计算区",
+                quote:"引用区"
+            };
+            if(notAllowArea.includes(tdItem.cell_area_type)){
+                this.$message({
+                    message:`${notAllowAreaName[tdItem.cell_area_type]} 不可以输入 ^_@`,
+                    type:'warning'
+                });
+                return false;
+            }
+            if(tdItem.cell_area_type == 'calcArea' ||  tdItem.cell_area_type == 'quote'){
+                return false;
+            }
             let target = this.$refs[`cell_${rindex}_${cindex}`][0];
             while(target && target.nodeName != "TD"){
                 target = target.parentNode;
             }
             if (!target || target.getAttribute('type') != 'cell')return false;
             this.$set(this,'currentActiveCell',tdItem);
-            this.$emit('currentCellChange',tdItem);
             this.$set(this,'editData',{
                 row:rindex,
                 col:cindex,
@@ -683,9 +708,8 @@ export default {
         },
         cellmousedown(rindex,cindex,tdItem,evt){
             evt.stopPropagation();
-            this.$set(this,'currentActiveCell',tdItem);
-            this.$emit('currentCellChange',tdItem);
             if(evt.button != 0)return false;
+            this.$set(this,'currentActiveCell',tdItem);
             this.visableRightMouseMenu = false;
             this.$set(this,'editData',{
                 row:null,
@@ -773,7 +797,7 @@ export default {
                 if(cell.cell_style.width){
                     reportWidth += parseInt(cell.cell_style.width);
                 }else{
-                    reportWidth += 200;
+                    reportWidth += 100;
                 }
             });
             this.$set(this,'reportBoxstyle',{
@@ -789,12 +813,12 @@ export default {
             this.$refs.eborder.$emit('updateBorder');
         },
         rowChangeResizerHandler(index, distance){
-            let tableData = this.tableData;
+            let tableData = this.getTableData();
             this.$set(this,'tableData',[]);
             let rowHeight = this.$refs[`row_${index}`][0].offsetHeight + distance;
             if(rowHeight > 21){
-                this.currentRowHeight = rowHeight;
                 this.$set(this,'currentActiveCell',tableData[index][1]);
+                this.currentRowHeight = rowHeight;
                 if(!tableData[index][1].row_index)tableData[index][1].row_index = index;
                 if(!tableData[index][1].col_index)tableData[index][1].col_index = 1;
                 this.defaultActiveCell(tableData[index][1])
@@ -808,11 +832,15 @@ export default {
         colChangeResizerHandler(index, distance){
             let tableData = this.tableData;
             this.$set(this,'tableData',[]);
-            let colWidth = this.$refs[`col_h${index}`][0].offsetWidth + distance;
-            if(colWidth > 30) {
-                tableData[0][index].cell_style.width = colWidth + 'px';
-                tableData[1][index].cell_style.width = colWidth + 'px';
-                tableData[2][index].cell_style.width = colWidth + 'px';
+            let colWidth = parseInt(tableData[0][index].cell_style.width) + distance;
+            for(let row = 0; row < tableData.length; row++){
+                if(colWidth > 30) {
+                    if(tableData[row][index].cell_colspan == 1){
+                        tableData[row][index].cell_style['width'] = colWidth + 'px';
+                    }else{
+                        tableData[row][index].cell_style['width'] = parseInt(tableData[row][index].cell_style.width) + distance + 'px'
+                    }
+                }
             }
             this.setTableData(JSON.parse(JSON.stringify(tableData)));
         },
@@ -829,7 +857,7 @@ export default {
         onselectstart:none
     }
     .excelReport{
-        position: relative;
+        // position: relative;
     }
     .v-header{
         background: #fff;
@@ -839,7 +867,7 @@ export default {
     .table{
         table-layout: fixed;
         .cell{
-           width: 200px;
+           width: 100px;
         }
         .cell.cell-row-list,.cell.cell-col-first{
             width: 60px;
@@ -896,7 +924,7 @@ export default {
     }
     .v-body{
         position:relative;
-       
+        top: -32px;
     }
     .mouseRightMenu{
         position: absolute;

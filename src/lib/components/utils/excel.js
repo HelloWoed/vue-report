@@ -46,14 +46,15 @@ const getId = function(){
 const getColTpl = function(type){
     if(!type)type = 'cell';
     return {
-        cell_value:'',
+        cell_value:null,
         cell_rowspan:1,
         cell_colspan:1,
         cell_area_type:'inputArea',
         cell_render_type:'text',//单元格默认为text
         cell_type:type,
-        cell_id:getId(),
-        cell_style:{width:'200px'}
+        // cell_id:getId(),
+        // cell_id:'',
+        cell_style:{width:'100px',background:'#fff'}
     }
 }
 export {getColTpl}
@@ -139,7 +140,7 @@ export function deleteRow(){
     let target = this.borderConf.startTarget;
     let tarAttr = getAttrs(target);
     let {tableData} = this;
-    tableData.splice(tarAttr.row,1);
+    tableData.splice(tarAttr.row,tarAttr.rowspan);
     this.$set(this,'tableData',tableData);
 }
 /**
@@ -151,7 +152,7 @@ export function deleteCol(){
     let tarAttr = getAttrs(target);
     let {tableData} = this;
     tableData.forEach(row =>{
-        row.splice(tarAttr.col,1);
+        row.splice(tarAttr.col,tarAttr.colspan);
     });
     this.$set(this,'tableData',tableData);
 }
@@ -169,6 +170,8 @@ export function insertRow(num){
         tableData.splice(tarAttr.row,0,rowData);
     })
     this.setTableData(tableData);
+    //触发保存事件
+    this.toolbarEvent.save.bind(this)(tableData);
 }
 /**
  * 插入列
@@ -191,6 +194,8 @@ export function insertCol(num){
         }
     });
     this.setTableData(tableData);
+    //触发保存事件
+    this.toolbarEvent.save.bind(this)(tableData);
 }
 /**
  * 指标默认数据
@@ -230,6 +235,7 @@ export function splitCell(){
     this.paint = this.paintDash.paintInfo;
     let attrs = getAttrs(this.borderConf.startTarget);
     let tableData = this.getTableData();
+    delete tableData[attrs.row][attrs.col].cell_style.width
     for(let r = this.paint.minRow; r < this.paint.minRow + attrs.rowspan; r++){
         for(let c = this.paint.minCol; c < this.paint.minCol + attrs.colspan; c++){
             tableData[r][c].cell_colspan = 1;
@@ -284,9 +290,11 @@ export function  mergeCell(){
     // let startTarAttr = getAttrs(this.borderConf.startTarget);
     // let endTarAttr = getAttrs(this.borderConf.endTarget);
     let tableData = this.getTableData();
-    
+    let mergeCellwidth = [];
     for(let r = this.paint.minRow; r <= this.paint.maxRow; r++){
+        let width = 0;
         for(let c = this.paint.minCol; c <= this.paint.maxCol; c++){
+            width += this.$refs[`cell_${r}_${c}`][0].offsetWidth
             if(tableData[r][c].cell_colspan > 1 || tableData[r][c].cell_rowspan > 1){
                 splitCellItem(tableData,r,c,this.$refs);
             }
@@ -294,13 +302,16 @@ export function  mergeCell(){
             tableData[r][c].cell_style.display = 'none';
             tableData[r][c].cell_value = '';
         };
+        mergeCellwidth.push(width);
     };
+    mergeCellwidth.sort((a,b)=> b-a);
     let rowSpanCount = this.paint.maxRow - this.paint.minRow + 1;
     let colSpanCount = this.paint.maxCol - this.paint.minCol + 1;
     // let rowSpanCount = getRowColMaxSpan(tableData,this.paint.minRow,this.paint.maxRow,this.paint.minCol,this.paint.maxCol,'cell_rowspan');
     // let colSpanCount = getRowColMaxSpan(tableData,this.paint.minRow,this.paint.maxRow,this.paint.minCol,this.paint.maxRow,'cell_colspan');
     tableData[this.paint.minRow][this.paint.minCol].cell_rowspan = rowSpanCount;
     tableData[this.paint.minRow][this.paint.minCol].cell_colspan = colSpanCount;
+    tableData[this.paint.minRow][this.paint.minCol].cell_style.width = mergeCellwidth[0] + 'px';
     this.setTableData(tableData);
     this.$refs.eborder.$emit('updateBorder');
     this.$emit('hideMenuBox');

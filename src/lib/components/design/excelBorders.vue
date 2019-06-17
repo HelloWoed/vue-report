@@ -153,15 +153,22 @@ export default {
                 );
                 this.visableDashedBorder = true;
                 this.copyConf.ctrl = moveEvt.ctrlKey;//是否按下ctrl键
+                this.copyConf.ctrlAlt = moveEvt.ctrlKey && moveEvt.altKey;//ctrl + alt
+                if(this.copyConf.ctrlAlt){
+                    this.copyConf.ctrl = false;
+                }
             },(upEvt)=>{
                 this.visableDashedBorder = false;
                 let startTarAttr = getAttrs(this.borderConf.startTarget);
                 let tableData = this.getTableData();
                 let startTarStyle = tableData[startTarAttr.row][startTarAttr.col].cell_style;
+                delete startTarStyle.height;
+                delete startTarStyle.width;
                 let startVal = tableData[startTarAttr.row][startTarAttr.col].cell_value;
                 const {maxCol,maxRow,minCol,minRow} = this.paint;
                 if(maxCol == minCol){
                     if(startVal - 0 == startVal){
+                        if(this.copyConf.ctrlAlt  && startVal < 10)tableData[startTarAttr.row][startTarAttr.col].cell_value = `0${startVal}`
                         if(this.copyConf.ctrl){
                             for(let i = minRow; i <= maxRow; i++){
                                 tableData[i][maxCol].cell_value = startVal;
@@ -170,13 +177,21 @@ export default {
                         }else{
                             if(startTarAttr.row == minRow){
                                 for(let i = minRow + 1; i <= maxRow; i++){
-                                    tableData[i][maxCol].cell_value = tableData[i-1][maxCol].cell_value - 0 + 1;
+                                    let value = tableData[i-1][maxCol].cell_value - 0 + 1;
+                                    if(this.copyConf.ctrlAlt && value < 10){
+                                        value = '0'+ value;
+                                    }
+                                    tableData[i][maxCol].cell_value = value;
                                     tableData[i][maxCol].cell_style = JSON.parse(JSON.stringify(startTarStyle));
                                 }
                             }
                             if(startTarAttr.row == maxRow){
                                 for(let j = maxRow - 1; j >= minRow; j--){
-                                    tableData[j][maxCol].cell_value = tableData[j+1][maxCol].cell_value - 0 - 1;
+                                    let value = tableData[j+1][maxCol].cell_value - 0 - 1;
+                                    if(this.copyConf.ctrlAlt && value < 10){
+                                        value = '0'+ value;
+                                    }
+                                    tableData[j][maxCol].cell_value = value;
                                     tableData[j][maxCol].cell_style = JSON.parse(JSON.stringify(startTarStyle));
                                 }
                             }
@@ -198,13 +213,21 @@ export default {
                         }else{
                             if(startTarAttr.col == minCol){
                                 for(let i = minCol + 1; i <= maxCol; i++){
-                                    tableData[maxRow][i].cell_value = tableData[maxRow][i -1].cell_value - 0 + 1;
+                                    let value = tableData[maxRow][i -1].cell_value - 0 + 1;
+                                    if(this.copyConf.ctrlAlt && value < 10){
+                                        value = '0'+ value;
+                                    }
+                                    tableData[maxRow][i].cell_value = value;
                                     tableData[maxRow][i].cell_style = JSON.parse(JSON.stringify(startTarStyle));
                                 }
                             }
                             if(startTarAttr.col == maxCol){
                                 for(let j = maxCol - 1; j >= minCol; j--){
-                                    tableData[maxRow][j].cell_value = tableData[maxRow][j + 1].cell_value - 0 - 1;
+                                    let value = tableData[maxRow][j + 1].cell_value - 0 - 1;
+                                    if(this.copyConf.ctrlAlt && value < 10){
+                                        value = '0'+ value;
+                                    }
+                                    tableData[maxRow][j].cell_value = value;
                                     tableData[maxRow][j].cell_style = JSON.parse(JSON.stringify(startTarStyle));
                                 }
                             }

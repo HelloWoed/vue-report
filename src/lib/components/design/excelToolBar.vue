@@ -48,6 +48,12 @@
                             width="400"
                             trigger="click">
                                 <el-form :label-position="labelPosition" :ref="`${item.target}_${item.name}`" label-width="100px">
+                                   <el-form-item :label="'表格宽度'">
+                                        <el-input type="number" :min="0" :step="1" placeholder="请输入" v-model="item.value.tableWidth"></el-input>
+                                    </el-form-item>
+                                   <el-form-item :label="'表格高度'">
+                                        <el-input type="number" :min="0" :step="1" placeholder="请输入" v-model="item.value.tableHeight"></el-input>
+                                    </el-form-item>
                                    <el-form-item :label="'锁定首行数'">
                                         <el-input type="number" :min="0" :step="1" placeholder="请输入" v-model="item.value.firstRow"></el-input>
                                     </el-form-item>
@@ -152,11 +158,11 @@ export default {
         initBarConf(){
             return [
                 {target:'tableInit',tips:'表格',className:['icon','iconfont','iconbiaoge'],spanVal:0.5,renderType:'icon',name:'tableSet'},
-                {target:'cell',tips:'只读区',areaSet:true,className:['icon','iconfont','iconshu'],spanVal:0.5,renderType:'icon',name:'readOnly',value:{backgroundColor:'#5A5A5A'}},
-                {target:'cell',tips:'表头区',areaSet:true,className:['icon','iconfont','iconbiaotoushezhi_huabanfuben'],spanVal:0.5,renderType:'icon',name:'tableHeader',value:{backgroundColor:'#D8D8D8'}},
-                {target:'cell',tips:'输入区',areaSet:true,className:['icon','iconfont','iconicon_xie'],spanVal:0.5,renderType:'icon',name:'inputArea',value:{backgroundColor:'#FFFFFF'}},
-                {target:'cell',tips:'计算区',areaSet:true,className:['icon','iconfont','iconjisuanqi'],spanVal:0.5,renderType:'icon',name:'calcArea',value:{backgroundColor:'#8DB4E3'}},
-                {target:'cell',tips:'引用区',areaSet:true,className:['icon','iconfont','iconyinyongziyuan'],spanVal:0.5,renderType:'icon',name:'quote',value:{backgroundColor:'#DBE5F1'}},
+                {target:'cell',area:'area',tips:'只读区',areaSet:true,className:['icon','iconfont','iconshu'],spanVal:0.5,renderType:'icon',name:'readOnly',value:{backgroundColor:'#5A5A5A'}},
+                {target:'cell',area:'area',tips:'表头区',areaSet:true,className:['icon','iconfont','iconbiaotoushezhi_huabanfuben'],spanVal:0.5,renderType:'icon',name:'tableHeader',value:{backgroundColor:'#D8D8D8'}},
+                {target:'cell',area:'area',tips:'输入区',areaSet:true,className:['icon','iconfont','iconicon_xie'],spanVal:0.5,renderType:'icon',name:'inputArea',value:{backgroundColor:'#FFFFFF'}},
+                {target:'cell',area:'area',tips:'计算区',areaSet:true,className:['icon','iconfont','iconjisuanqi'],spanVal:0.5,renderType:'icon',name:'calcArea',value:{backgroundColor:'#8DB4E3'}},
+                {target:'cell',area:'area',tips:'引用区',areaSet:true,className:['icon','iconfont','iconyinyongziyuan'],spanVal:0.5,renderType:'icon',name:'quote',value:{backgroundColor:'#DBE5F1'}},
                 {className:['split-line'],spanVal:0.5,renderType:'split',name:'split'},
                 {target:'cell',tips:'加粗',className:['icon','iconfont','iconzitijiacu'],spanVal:0.5,renderType:'icon',name:'bold',value:{fontWeight:'bold'}},
                 {target:'cell',tips:'斜体',className:['icon','iconfont','iconxieti'],spanVal:0.5,renderType:'icon',name:'italic',value:{fontStyle:'italic'}},
@@ -174,15 +180,15 @@ export default {
                 {target:'cell',tips:'上下居中',className:['icon','iconfont','iconformat-vertical-align-center'],spanVal:0.5,renderType:'icon',name:'vercicalMiddle',value:{verticalAlign:'middle'}},
                 {target:'cell',tips:'下对齐',className:['icon','iconfont','iconxiaduiqi'],spanVal:0.5,renderType:'icon',name:'textBottom',value:{verticalAlign:'bottom'}},
                 // {className:['split-line'],spanVal:0.5,renderType:'split',name:'split'},
-                {target:'tableLock',eName:'locked',tips:'锁定',className:['icon','iconfont','iconlock-line'],name:'locked',spanVal:0.5,renderType:'icon',value:{firstRow:null,leftCol:null,rightCol:null}},
-                {target:'tableLock',eName:'unlock',tips:'解锁',className:['icon','iconfont','iconlock-unlock-line'],name:'unlock',spanVal:0.5,renderType:'icon',value:{firstRow:null,leftCol:null,rightCol:null}},
+                {target:'tableLock',eName:'locked',tips:'锁定',className:['icon','iconfont','iconlock-line'],name:'locked',spanVal:0.5,renderType:'icon',value:{firstRow:null,leftCol:null,rightCol:null,tableWidth:null,tableHeight:null}},
+                {target:'tableLock',eName:'unlock',tips:'解锁',className:['icon','iconfont','iconlock-unlock-line'],name:'unlock',spanVal:0.5,renderType:'icon',value:{firstRow:null,leftCol:null,rightCol:null,tableWidth:null,tableHeight:null}},
                 {target:'table',eName:'tablesetting',tips:'表格设置',className:['icon','iconfont','iconsetting'],name:'tablesetting',spanVal:0.5,renderType:'icon'},
                 {target:'table',eName:'upload',tips:'上传',className:['icon','iconfont','iconshangchuan'],name:'upload',spanVal:0.5,renderType:'icon'},
                 {className:['split-line'],spanVal:2,renderType:'split',name:'splitMiddle'},
                 {target:'table',eName:'preview',tips:'预览',className:['icon','iconfont','iconzitiyulan'],name:'preview',spanVal:0.5,renderType:'icon'},
                 {target:'table',eName:'tableValidate',tips:'校验',className:['icon','iconfont','iconxitongguanli-jianchayiju'],name:'tableValidate',spanVal:0.5,renderType:'icon'},
                 {target:'table',eName:'save',tips:'保存',className:['icon','iconfont','iconbaocun'],name:'save',spanVal:0.5,renderType:'icon'},
-                {target:'table',eName:'share',tips:'分享',className:['icon','iconfont','iconicon_share'],name:'share',spanVal:0.5,renderType:'icon'}
+                {target:'table',eName:'share',tips:'发布',className:['icon','iconfont','iconicon_share'],name:'share',spanVal:0.5,renderType:'icon'}
             ]
         },
         colorChange(item){

@@ -240,8 +240,9 @@ export default {
     data(){
         return {
             parseCellValue(value){
+                if(!value)value = '';
                 if(typeof value != 'object'){
-                    return value
+                    return value || '';
                 }else{
                     if(Object.prototype.toString.call(value) == "[object Array]"){
                         return value.join(',');
@@ -278,6 +279,13 @@ export default {
         
     },
     watch:{
+        tableConfig:{
+            handler(newVal,oldVal){
+                this.attrDataConf = newVal;
+                this.tableData = newVal.tableData;
+                this.tableHeaderData = getBaseColTitle(newVal.colCount);
+            },deep:true
+        },
         tableData:{
             handler(newVal,oldVal){
                 if(newVal.length < 1) return false;

@@ -147,7 +147,7 @@
                 </div>
                 <div class="v-body" ref="body" @contextmenu.prevent="visibleRightMouseMenu($event)">
                     <table class="table table-body" :style="reportBoxstyle">
-                        <tr v-for="(trItem,rindex) in tableData" :key="rindex" v-show="rindex > 0">
+                        <tr v-for="(trItem,rindex) in tableData" :key="rindex">
                             <td v-for="(tdItem,cindex) in trItem" 
                             :key="cindex" 
                             class="cell"
@@ -301,7 +301,6 @@ import ExcelCellEditr from './excelCellEditr'
 import ExcelToolBar from './excelToolBar'
 import AttrSet from './attrSet'
 import RenderCell from './renderCell'
-
 export default {
     name:"VueExcel",
     props:{
@@ -328,8 +327,8 @@ export default {
         loadIndrNode:{type:Function,default: (node, resolve)=>{//指标树形结构load方法
             defaultLoadIndr(node, resolve);
         }},
-        dimensionData:{type:Function,default:()=>{
-            return [
+        dimensionData:{type:Function,default:(resolve,reject,data,node,vm)=>{
+            let datas =  [
                 {id:'001',value:'维度指标1'},
                 {id:'002',value:'维度指标2'},
                 {id:'003',value:'维度指标3'},
@@ -337,6 +336,7 @@ export default {
                 {id:'005',value:'维度指标5'},
                 {id:'006',value:'维度指标6'},
             ]
+            resolve(datas);
         }},//维度数据
         indrSelectChange:{type:Function,default:(data,node,refTree,self)=>{//指标树选择改变时触发
             //用promise是为了如果此处需要拉接口处理数据，在子组件内需要等接口数据处理完成后才能处理
@@ -349,7 +349,10 @@ export default {
         }},
         indrPprops:{type:Object,default(){
             return {
-                label: 'name',
+                // label:'name',//label 支持 string 和 function
+                label:(data, node)=>{
+                    return data.name
+                },
                 // children: 'zones',
                 disabled:(data,node)=>{
                     if(node.level > 3)return false;
@@ -361,7 +364,9 @@ export default {
                 }
             }
         }},
-        getIndrDatas:{type:Function,default:(data)=>{//获取指标数据
+        dimensionProp:{type:Object,default(){return {label:'value'}}},
+        indicatorListProp:{type:Object,default(){return {label:'value'}}},
+        getIndrDatas:{type:Function,default:(resolve,reject,data,vm)=>{//获取指标数据
             return [
                 {id:'001',value:'普通本科生因其他休退学数1'},
                 {id:'002',value:'普通本科生因其他休退学数2'},
@@ -450,6 +455,10 @@ export default {
         }},
         treeSelectedResChange:{type:Function,default:(treeVm,cellId)=>{}},
         clearTreeSelected:{type:Function,default:(treeVm,cellId)=>{}},
+        selectionRadioProp:{type:Function,default:(item)=>{return item.name}},
+        selectionCheckBoxProp:{type:Function,default:(item)=>{
+            return item.name
+        }},
         cellProps:{type:Object,default(){return {
             radio:{
                 label:'name',
@@ -463,7 +472,266 @@ export default {
                 label:'name',
                 value:'name'
             }
-        }}}
+        }}},
+        cellCalculationConfig:{
+            type:Function,
+            default:()=>{
+                return {
+                    //与公式设计插件的attr_data_conf event_ele_conf配置一致
+                    attr_data_conf:{
+                        indrProp:{
+                            // label:'name',//label 支持 string 和 function
+                            label:(data, node)=>{
+                                return data.name
+                            },
+                            // children: 'zones',
+                            disabled:(data,node)=>{
+                                if(node.level > 3)return false;
+                                else return true;
+                            },
+                            isLeaf: (data,node)=>{
+                                if(node.level > 3)return true;
+                                else return data.leaf;
+                            }
+                        },
+                        dividerOption:['筛选指标','维度选择','可选指标','已选中指标'],
+                        //维度数据显示label prop
+                        // dimensionProp:{label:'value'},
+                        dimensionProp:(data)=>{
+                            return data.value;
+                        },
+                        //指标列表 label propv  可以是function
+                        indicatorListProp:{label:'value'},
+                        //计算符号 prop  可以是function
+                        calcSymbolProp:{label:'value'},
+                        //函数 prop  可以是function
+                        existFunProp:{label:'name'}
+                    },
+                    event_ele_conf:{
+                        created:function(){
+
+                        },
+                        mounted:function(){
+
+                        },
+                        getSymbolData:function(resolve){//获取计算符号数据
+                            let data = [
+                                {
+                                    id:'001',
+                                    type:'symbol',
+                                    value:"+"
+                                },
+                                {
+                                    id:'002',
+                                    type:'symbol',
+                                    value:"-"
+                                },
+                                {
+                                    id:'003',
+                                    type:'symbol',
+                                    value:"*"
+                                },
+                                {
+                                    id:'004',
+                                    type:'symbol',
+                                    value:"/"
+                                },
+                                {
+                                    id:'005',
+                                    type:'symbol',
+                                    value:"="
+                                },
+                                {
+                                    id:'006',
+                                    type:'symbol',
+                                    value:">"
+                                },
+                                {
+                                    id:'007',
+                                    type:'symbol',
+                                    value:">="
+                                },
+                                {
+                                    id:'008',
+                                    type:'symbol',
+                                    value:"<"
+                                },
+                                {
+                                    id:'009',
+                                    type:'symbol',
+                                    value:"<="
+                                },
+                                {
+                                    id:'010',
+                                    type:'symbol',
+                                    value:"=="
+                                },
+                                {
+                                    id:'011',
+                                    type:'symbol',
+                                    value:"!="
+                                },
+                                {
+                                    id:'012',
+                                    type:'symbol',
+                                    value:"("
+                                },
+                                {
+                                    id:'013',
+                                    type:'symbol',
+                                    value:")"
+                                },
+                                {
+                                    id:'014',
+                                    type:'symbol',
+                                    value:"["
+                                },
+                                {
+                                    id:'015',
+                                    type:'symbol',
+                                    value:"]"
+                                },
+                                {
+                                    id:'016',
+                                    type:'symbol',
+                                    value:"in"
+                                },
+                                {
+                                    id:'017',
+                                    type:'symbol',
+                                    value:"not in"
+                                },
+                                {
+                                    id:'018',
+                                    type:'symbol',
+                                    value:"if"
+                                },
+                                {
+                                    id:'019',
+                                    type:'symbol',
+                                    value:"else"
+                                },
+                                {
+                                    id:'020',
+                                    type:'symbol',
+                                    value:"and"
+                                },
+                                {
+                                    id:'021',
+                                    type:'symbol',
+                                    value:"or"
+                                },
+                                {
+                                    id:'022',
+                                    type:'symbol',
+                                    value:","
+                                },
+                                {
+                                    id:'023',
+                                    type:'symbol',
+                                    value:"delete"
+                                }
+                            ];
+                            resolve(data);
+                        },
+                        getExistFuns:function(resolve){//获取函数数据
+                            let data = [
+                                {
+                                    id:'001',
+                                    name:'求和',
+                                    value:'COUNT'
+                                },
+                                {
+                                    id:'002',
+                                    name:'平均值',
+                                    value:'AVERAGE'
+                                },
+                                {
+                                    id:'003',
+                                    name:'最大值',
+                                    value:'MAX'
+                                },
+                                {
+                                    id:'004',
+                                    name:'最小值',
+                                    value:'MIN'
+                                }
+                            ];
+                            resolve(data);
+                        },
+                        calcIndrSelectChange:function(resolve,newData,oldData){
+                            resolve(newData);
+                        },
+                        parseCalcBoardLabel:function(item){//解析当前项要在计算面板中显示的值
+                            return item.value;
+                        },
+                        completeCalculation:function(data){
+                            console.log(data);
+                            let res = '';
+                            data.forEach(item=>{
+                                item.type == 'indr' ? res += item.id : res += item.value;
+                            });
+                            console.log('your calculations is : ' + res);
+                        },
+                        loadIndrNode:function(node, resolve){
+                            if (node.level === 0) {
+                                return resolve([{id:Math.ceil(Math.random()*100000) + new Date().getTime(), name: 'region' }]);
+                            }
+                            if (node.level >= 1) setTimeout(() => {
+                                const data = [{
+                                    id:Math.ceil(Math.random()*100000) + new Date().getTime(),
+                                    name: 'leaf',
+                                    leaf: true
+                                }, {
+                                    id:Math.ceil(Math.random()*100000) + new Date().getTime(),
+                                    name: 'zone'
+                                }];
+                                return resolve(data);
+                            }, 500);
+                        },
+                        indrSelectChange:function(data,node,refTree,self){//指标树选择改变时触发
+                            //用promise是为了如果此处需要拉接口处理数据，在子组件内需要等接口数据处理完成后才能处理
+                            return new Promise((resolve,reject)=>{
+                                //实现单选
+                                refTree.setCheckedNodes([]);
+                                refTree.setCheckedNodes([data]);
+                                resolve(data);
+                            });
+                        },
+                        dimensionData(resolve,reject,data,node,vm){//维度数据
+                            let datas =  [
+                                {id:'001',value:'维度指标1'},
+                                {id:'002',value:'维度指标2'},
+                                {id:'003',value:'维度指标3'},
+                                {id:'004',value:'维度指标4'},
+                                {id:'005',value:'维度指标5'},
+                                {id:'006',value:'维度指标6'},
+                            ]
+                            resolve(datas);
+                        },
+                        getIndrDatas(resolve,reject,data,vm){//获取指标数据
+                            let datas =  [
+                                {id:'001',value:'普通本科生因其他休退学数1'},
+                                {id:'002',value:'普通本科生因其他休退学数2'},
+                                {id:'003',value:'普通本科生因其他休退学数3'},
+                                {id:'004',value:'普通本科生因其他休退学数4'},
+                                {id:'005',value:'普通本科生因其他休退学数5'},
+                                {id:'006',value:'普通本科生因其他休退学数6'},
+                                {id:'007',value:'普通本科生因其他休退学数7'},
+                                {id:'008',value:'普通本科生因其他休退学数8'},
+                                {id:'009',value:'普通本科生因其他休退学数9'},
+                                {id:'010',value:'普通本科生因其他休退学数10'},
+                                {id:'011',value:'普通本科生因其他休退学数11'}
+                            ]
+                            resolve(datas);
+                        },
+                        destroyed:function(){
+
+                        }
+                    }
+                }
+            }
+        }
     },
     components:{ExcelBorder,RightMouseMenu,ExcelResizer,ExcelCellEditr,ExcelToolBar,AttrSet,RenderCell},
     data(){
@@ -515,13 +783,20 @@ export default {
             confSelectionItemData:this.confSelectionItemData,
             inputTypeConfChange:this.inputTypeConfChange,
             getCurrentActiveCell:this.getCurrentActiveCell,
+            updateCurrentActiveCell:this.updateCurrentActiveCell,
             setPaintDash:this.setPaintDash,
             treeProps:this.treeProps,
             indrPprops:this.indrPprops,
+            selectionRadioProp:this.selectionRadioProp,
+            selectionCheckBoxProp:this.selectionCheckBoxProp,
+            indicatorListProp:this.indicatorListProp,
+            dimensionProp:this.dimensionProp,
             treeLoadNode:this.treeLoadNode,
             treeSelectedResChange:this.treeSelectedResChange,
             clearTreeSelected:this.clearTreeSelected,
             getCellProps:this.getCellProps,
+            cellCalculationConfig:this.cellCalculationConfig,
+            cellValidate:this.cellValidate,
         }
     },
     computed:{
@@ -530,23 +805,25 @@ export default {
         }
     },
     created(){
-        this.attrDataConf = this.tableConfig;
-        if(this.attrDataConf.tableData){
-            this.$set(this,'tableData',this.attrDataConf.tableData);
-        }else{
-            this.$set(this,'tableData',initTableData(this.attrDataConf.rowCount,this.attrDataConf.colCount));
-        }
-        this.tableHeaderData = getBaseColTitle(this.attrDataConf.colCount);
-        
+        //初始化
+        this.$set(this,'attrDataConf',this.tableConfig);
+        this.initReportOrginData();
     },
     watch:{
+        tableConfig:{
+            handler(newVal,oldVal){
+                this.$set(this,'attrDataConf',newVal);
+                this.initReportOrginData();
+                this.defaultActiveCell();
+            },deep:true
+        },
         tableData:{
             handler(newVal,oldVal){
                 if(newVal.length < 1) return false;
                 setTimeout(()=>{
-                    // setTimeout(()=>{ this.updateTableCellHeight();});
                     this.updateTableCellHeight();
                     this.resizeReportBox();
+                    this.defaultActiveCell();
                     if(this.borderConf.startTarget){
                         this.borderReload();
                     }
@@ -563,16 +840,25 @@ export default {
         currentActiveCell:{
             handler(newVal,oldVal){
                 if(!oldVal || (newVal.cell_id != oldVal.cell_id)){
-                    this.$set(this,'currentRowHeight',this.$refs[`cell_${newVal.row_index}_${newVal.col_index}`][0].offsetHeight)
+                    let r,c;
+                    if(newVal.row_index){
+                        r = newVal.row_index;
+                        c = newVal.col_index;
+                    }else if(this.borderConf.row){
+                        r = this.borderConf.row;
+                        c = this.borderConf.col;
+                    }
+                    if(r && c){
+                        this.$set(this,'currentRowHeight',this.$refs[`cell_${r}_${c}`][0].offsetHeight);
+                    }
                 }
-                
+                this.$emit('currentCellChange',newVal);
             }
         }
     },
     mounted(){
         //默认第一行第一列选中激活
         this.defaultActiveCell();
-
         this.$on('hideMenuBox',()=>{
             this.visableRightMouseMenu = false;
         })
@@ -584,26 +870,58 @@ export default {
         });
     },
     methods:{
+        initReportOrginData(){
+            if(this.attrDataConf.tableData){
+                this.$set(this,'tableData',this.attrDataConf.tableData);
+            }else{
+                let tbData = initTableData(this.attrDataConf.rowCount,this.attrDataConf.colCount);
+                this.$set(this,'tableData',tbData);
+                //触发保存事件
+                this.toolbarEvent.save.bind(this)(this.tableData)
+            }
+            this.tableHeaderData = getBaseColTitle(this.attrDataConf.colCount);
+        },
+        updateCurrentActiveCell(cellData){
+            this.$set(this,'currentActiveCell',JSON.parse(JSON.stringify(cellData)));
+        },
         updateTableCellHeight(){
             let {tableData} = this;
-            let r = this.getCurrentActiveCell().row_index;
-            let height = this.$refs[`cell_${r}_1`][0].offsetHeight;
+            let r = null;
+            if(this.getCurrentActiveCell().row_index){
+                r = this.getCurrentActiveCell().row_index;
+            }else{
+                r = this.borderConf.row;
+            }
+            let currenCell = this.getCurrentActiveCell();
+            let calHeight = 0;
+            for(let row = r; row < r + currenCell.cell_rowspan; row++){
+                calHeight += this.$refs[`row_${r}`][0].offsetHeight;
+                tableData[r][0].cell_style.height = this.$refs[`row_${r}`][0].offsetHeight + 'px';
+            };
+            this.$set(this,'currentRowHeight',calHeight);
+            let height = parseInt(currenCell.cell_style.height);
             if(!this.currentRowHeight || (height - this.currentRowHeight > 3)){
                 this.currentRowHeight = height;
+                tableData[r].forEach((cell,c)=>{
+                    cell.cell_style.height = this.currentRowHeight + 'px';
+                    if(c == 0){
+                        cell.cell_style.height = this.currentRowHeight + 3 + 'px';
+                    }
+                });
             }
-            tableData[r].forEach((cell,c)=>{
-                cell.cell_style.height = this.currentRowHeight + 'px';
-                if(c == 0){
-                    cell.cell_style.height = this.currentRowHeight + 3 + 'px';
-                }
-            });
-            
         },
         defaultActiveCell(tdData){
             let tdItem = null;
             let targetCellDom = null;
+            let tableData = this.getTableData();
+            if(tableData.length == 0)return false;
+            if(this.currentActiveCell){
+                if(tableData[this.currentActiveCell.row_index][this.currentActiveCell.col_index] && this.currentActiveCell.cell_id){
+                    return false;
+                }
+            };
             if(!tdData){
-                tdItem = this.tableData[1][1];
+                tdItem = tableData[1][1];
                 tdItem.row_index = 1;
                 tdItem.col_index = 1;
                 targetCellDom = this.$refs.cell_1_1[0];
@@ -613,7 +931,6 @@ export default {
             }
             this.activeTdData = tdItem;
             this.$set(this,'currentActiveCell',tdItem);
-            this.$emit('currentCellChange',tdItem);
             let attr = getAttrs(targetCellDom);
             this.$set(this,'paintDash',{
                 attrs:attr,
@@ -631,8 +948,18 @@ export default {
             let value = {
                 fixedHeaderCount:Number(item.value.firstRow),
                 fixedLeftCount:Number(item.value.leftCol),
-                fixedRightCount:Number(item.value.rightCol),
+                fixedRightCount:Number(item.value.rightCol)
             };
+            if(Number(item.value.tableWidth)){
+                value.width = Number(item.value.tableWidth) + 'px';
+            }else{
+                delete this.attrDataConf.width;
+            }
+            if(Number(item.value.tableHeight)){
+                value.height = Number(item.value.tableHeight);
+            }else{
+                delete delete this.attrDataConf.height;
+            }
             Object.assign(this.attrDataConf,value);
             let attrDataConf = JSON.parse(JSON.stringify(this.attrDataConf));
             this.$set(this,'attrDataConf',attrDataConf);
@@ -719,8 +1046,14 @@ export default {
         initTableRowCol(data){
             this.attrDataConf.rowCount = data.row;
             this.attrDataConf.colCount = data.col;
-            this.setTableData(initTableData(this.attrDataConf.rowCount,this.attrDataConf.colCount));
+            let tbData = initTableData(this.attrDataConf.rowCount,this.attrDataConf.colCount);
+            this.setTableData(tbData);
+            this.attrDataConf.tableData = tbData;
             this.tableHeaderData = getBaseColTitle(this.attrDataConf.colCount);
+            //初始化当前单元格
+            this.$set(this,'currentActiveCell',null);
+            //触发保存事件
+            this.toolbarEvent.save.bind(this)(this.tableData)
         },
         attrModel(e){
             this.attrModelShow = !this.attrModelShow;
@@ -757,12 +1090,30 @@ export default {
                                         Object.assign(tableData[r][c].cell_style,data.value);
                                     }
                                 }else{
-                                    Object.assign(tableData[r][c].cell_style,data.value);
+                                    if(data.name == "backgroundColor"){
+                                        if( tableData[r][c].cell_area_type == 'inputArea'){
+                                            Object.assign(tableData[r][c].cell_style,data.value);
+                                        }else{
+                                            this.$message({
+                                                message:'非输入区单元格不可设置背景色 @_@',
+                                                type:'warning'
+                                            });
+                                        }
+                                    }else{
+                                        Object.assign(tableData[r][c].cell_style,data.value);
+                                    }
+                                    if(data.area == 'area'){
+                                        tableData[r][c].cell_area_type = data.name;
+                                        if(data.name != "inputArea"){
+                                            tableData[r][c].cell_render_type = 'text';
+                                            tableData[r][c].cell_value = "";
+                                        }
+                                    }
                                 }
                             })
-                        if(data.areaSet){
-                            tableData[r][c].area_type = data.name;
-                        }
+                            if(data.areaSet){
+                                tableData[r][c].cell_area_type = data.name;
+                            }
                         }
                     }
                 }else if(data.target == 'tableRowCol'){
@@ -771,7 +1122,10 @@ export default {
                         for(let r = minRow; r <= maxRow; r++){
                             this.currentRowHeight = parseInt(data.value);
                             tableData[r].forEach(cell=>{
-                                cell.cell_style['height'] = data.value;
+                                if(cell.cell_rowspan == 1){
+                                    cell.cell_style['height'] = data.value;
+                                }
+                                
                             });
                             // tableData[r][0].cell_style['height'] = data.value;
                             // tableData[r][1].cell_style['height'] = data.value;
@@ -779,13 +1133,22 @@ export default {
                         }
                         
                     }else if(data.name == 'setWidth'){
-                        for(let c = minCol; c <= maxCol; c++){
-                            tableData[0][c].cell_style['width']=data.value;
-                            // tableData[0][tableData[0].length - 1].cell_style['width']=data.value;
-                            tableData[1][c].cell_style['width']=data.value;
-                            // tableData[1][tableData[1].length - 1].cell_style['width']=data.value;
-                            tableData[2][c].cell_style['width']=data.value;
-                            // tableData[2][tableData[2].length - 1].cell_style['width']=data.value;
+                        let startWidth = parseInt(tableData[0][minCol].cell_style.width);
+                        let betweenVal = parseInt(data.value) - startWidth;
+                        for(let row = 0; row < tableData.length; row++){
+                            for(let c = minCol; c <= maxCol; c++){
+                                if(tableData[row][c].cell_colspan == 1){
+                                    tableData[row][c].cell_style['width'] = data.value;
+                                }else{
+                                    tableData[row][c].cell_style['width'] = parseInt(tableData[row][c].cell_style.width) + betweenVal + 'px'
+                                }
+                                // tableData[0][c].cell_style['width']=data.value;
+                                // tableData[0][tableData[0].length - 1].cell_style['width']=data.value;
+                                // tableData[1][c].cell_style['width']=data.value;
+                                // tableData[1][tableData[1].length - 1].cell_style['width']=data.value;
+                                // tableData[2][c].cell_style['width']=data.value;
+                                // tableData[2][tableData[2].length - 1].cell_style['width']=data.value;
+                            }
                         }
                     }
                     
@@ -824,13 +1187,27 @@ export default {
         },
         cellDblclickHandler(rindex,cindex,tdItem,e){
             // let target = e.target;
+            let notAllowArea = ["calcArea","quote"];
+            let notAllowAreaName = {
+                calcArea:"计算区",
+                quote:"引用区"
+            };
+            if(notAllowArea.includes(tdItem.cell_area_type)){
+                this.$message({
+                    message:`${notAllowAreaName[tdItem.cell_area_type]} 不可以输入 ^_@`,
+                    type:'warning'
+                });
+                return false;
+            }
+            if(tdItem.cell_area_type == 'calcArea' ||  tdItem.cell_area_type == 'quote'){
+                return false;
+            }
             let target = this.$refs[`cell_${rindex}_${cindex}`][0];
             while(target && target.nodeName != "TD"){
                 target = target.parentNode;
             }
             if (!target || target.getAttribute('type') != 'cell')return false;
             this.$set(this,'currentActiveCell',tdItem);
-            this.$emit('currentCellChange',tdItem);
             this.$set(this,'editData',{
                 row:rindex,
                 col:cindex,
@@ -912,9 +1289,8 @@ export default {
         },
         cellmousedown(rindex,cindex,tdItem,evt){
             evt.stopPropagation();
-            this.$set(this,'currentActiveCell',tdItem);
-            this.$emit('currentCellChange',tdItem);
             if(evt.button != 0)return false;
+            this.$set(this,'currentActiveCell',tdItem);
             this.visableRightMouseMenu = false;
             this.$set(this,'editData',{
                 row:null,
@@ -996,12 +1372,12 @@ export default {
             })
         },
         rowChangeResizerHandler(index, distance){
-            let tableData = this.tableData;
+            let tableData = this.getTableData();
             this.$set(this,'tableData',[]);
             let rowHeight = this.$refs[`row_${index}`][0].offsetHeight + distance;
             if(rowHeight > 21){
-                this.currentRowHeight = rowHeight;
                 this.$set(this,'currentActiveCell',tableData[index][1]);
+                this.currentRowHeight = rowHeight;
                 if(!tableData[index][1].row_index)tableData[index][1].row_index = index;
                 if(!tableData[index][1].col_index)tableData[index][1].col_index = 1;
                 this.defaultActiveCell(tableData[index][1])
@@ -1019,7 +1395,7 @@ export default {
                 if(cell.cell_style.width){
                     reportWidth += parseInt(cell.cell_style.width);
                 }else{
-                    reportWidth += 200;
+                    reportWidth += 100;
                 }
             });
             this.$set(this,'reportBoxstyle',{
@@ -1029,14 +1405,15 @@ export default {
         colChangeResizerHandler(index, distance){
             let tableData = this.tableData;
             this.$set(this,'tableData',[]);
-            let colWidth = this.$refs[`col_h${index}`][0].offsetWidth + distance;
-            if(colWidth > 30) {
-                tableData[0][index].cell_style.width = colWidth + 'px';
-                // tableData[0][tableData[0].length-1].cell_style.width = colWidth + 'px';
-                tableData[1][index].cell_style.width = colWidth + 'px';
-                // tableData[1][tableData[1].length-1].cell_style.width = colWidth + 'px';
-                tableData[2][index].cell_style.width = colWidth + 'px';
-                // tableData[2][tableData[2].length-1].cell_style.width = colWidth + 'px';
+            let colWidth = parseInt(tableData[0][index].cell_style.width) + distance;
+            for(let row = 0; row < tableData.length; row++){
+                if(colWidth > 30) {
+                    if(tableData[row][index].cell_colspan == 1){
+                        tableData[row][index].cell_style['width'] = colWidth + 'px';
+                    }else{
+                        tableData[row][index].cell_style['width'] = parseInt(tableData[row][index].cell_style.width) + distance + 'px'
+                    }
+                }
             }
             this.setTableData(JSON.parse(JSON.stringify(tableData)));
         },
@@ -1049,7 +1426,9 @@ export default {
             this.rightMouseMenuStyle = {
                 // top:`${e.clientY - this.$refs['scrollTableBox'].offsetTop - this.$refs['scrollTableBox'].scrollTop}px`,
                 // left:`${e.clientX - this.$refs['scrollTableBox'].offsetLeft - this.$refs['scrollTableBox'].scrollLeft}px`
-                top:`${e.clientY - this.$refs['excelRef'].offsetTop - this.$refs['toolBarRef'].clientHeight - 20}px`,
+                // top:`${e.clientY - this.$refs['excelRef'].offsetTop - this.$refs['toolBarRef'].clientHeight - 20}px`,
+                // left:`${e.clientX - this.$refs['excelRef'].offsetLeft}px`
+                top:`${e.clientY - this.$refs['excelRef'].offsetTop}px`,
                 left:`${e.clientX - this.$refs['excelRef'].offsetLeft}px`
             }
             this.visableRightMouseMenu = true;
@@ -1058,8 +1437,12 @@ export default {
             this.$refs.eborder.$emit('updateBorder');
         },
         activeCellInput(val){
-            this.$refs.eborder.$emit('updateBorder');
-            this.activeTdData.cell_value = val.target.value;
+            let currentCell = this.getCurrentActiveCell();
+            let notAllowArea = ["calcArea","quote"];
+            if(!notAllowArea.includes(currentCell.cell_area_type)){
+                this.$refs.eborder.$emit('updateBorder');
+                this.activeTdData.cell_value = val.target.value;
+            }
         },
         
     }
@@ -1097,7 +1480,7 @@ export default {
         onselectstart:none
     }
     .excelReport{
-        position: relative;
+        // position: relative;
         .attrSet.showAttrModel{
             width:28%;
             animation: attrSetShowWidth .3s;
@@ -1138,7 +1521,7 @@ export default {
     .table{
         table-layout: fixed;
         .cell{
-           width: 200px;
+           width: 100px;
         }
         .cell.cell-row-list,.cell.cell-col-first{
             width: 60px;
@@ -1197,7 +1580,7 @@ export default {
     }
     .v-body{
         position:relative;
-       
+        top: -32px;
     }
     .mouseRightMenu{
         position: absolute;

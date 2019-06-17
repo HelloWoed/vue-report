@@ -32,7 +32,13 @@ export default {
   watch:{
     target:{
       handler(nVal,oVal){
-        if(nVal.target)this.activeCellEdit = true;
+        if(nVal.target){
+          let tarAttr = getAttrs(nVal.target);
+          let notAllowArea = ["calcArea","quote"];
+          if(!notAllowArea.includes(tarAttr.areatype)){
+            this.activeCellEdit = true;
+          }
+        }
         else this.activeCellEdit = false;
         this.setEditInfo();
       },deep:true

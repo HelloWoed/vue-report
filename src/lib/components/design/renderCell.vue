@@ -65,6 +65,10 @@
                 {{cellData.cell_type == 'cell' ? cellData.cell_value : rindex}}
             </template>
         </span>
+        <!-- 校验 -->
+        <span v-if="cellData.validRes && cindex !=0" :style="cellData.validRes.styles">
+            {{cellData.validRes.value}}
+        </span>
     </span>
 </template>
 <script>
@@ -80,7 +84,7 @@ export default {
             }
         }
     },
-    inject:["treeProps", "treeLoadNode", "treeSelectedResChange", "clearTreeSelected", "getCellProps"],
+    inject:["treeProps", "treeLoadNode", "treeSelectedResChange", "clearTreeSelected", "getCellProps","cellValidate"],
     data(){
         return {
             cellProps:{}
@@ -89,10 +93,24 @@ export default {
     created(){
         this.cellProps = this.getCellProps();
     },
+    watch:{
+        cellData:{
+            handler(newVal,oldVal){
+                if(newVal.cell_tester)this.validateCell(newVal);
+            },deep:true
+        }
+    },
     mounted(){
        
     },
     methods:{
+        validateCell(cell){
+            new Promise((resolve,reject)=>{
+                this.cellValidate(resolve,cell);
+            }).then(data=>{
+
+            });
+        },
         treeSelected(cellId){
             this.treeSelectedResChange(this.$refs[cellId],cellId)
         },

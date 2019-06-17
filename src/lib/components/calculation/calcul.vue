@@ -1,13 +1,13 @@
 <template>
-    <div class="calculation">
+    <div class="calculation" :ref="calcRef">
         <el-row :gutter="10">
             <el-col :span="6">
                 <div>
                     <el-row :gutter="20">
-                        <el-col :span="18">
+                        <el-col :span="12">
                             <el-input placeholder="请输入内容" size="mini" v-model="filterIndrVal" @input="filterIndr" suffix-icon="el-icon-search" clearable></el-input>
                         </el-col>
-                        <el-col :span="4">
+                        <el-col :span="12">
                             <el-button type="primary" size="mini" @click="selIndr">选择指标</el-button>
                         </el-col>
                     </el-row>
@@ -16,7 +16,7 @@
                     <ul class="indr-list-box">
                         <li class="indr-list-item" v-for="(item,index) in selectedIndr" :key="index" @click="setIndrs(item)">
                             <span class="list-num">{{index + 1}}</span>
-                            <span class="list-item-name">{{item.value}}</span>
+                            <span class="list-item-name">{{parseIndrListLabel(item)}}</span>
                         </li>
                     </ul>
                 </div>
@@ -31,12 +31,12 @@
                         @clearCalculation="clearCalculation"
                         :calculationRes="calculationRes" />
                     </el-tab-pane>
-                    <el-tab-pane label="校验公式" name="validiteCalc" :lazy="true">
+                    <!-- <el-tab-pane label="校验公式" name="validiteCalc" :lazy="true">
                         <ValiditorCalc />
                     </el-tab-pane>
                     <el-tab-pane label="核查公式" name="checkCalc" :lazy="true">
                         <CheckCalc />
-                    </el-tab-pane>
+                    </el-tab-pane> -->
                 </el-tabs>
             </el-col>
             <el-col :span="6">
@@ -44,15 +44,15 @@
                 <el-divider>插入函数</el-divider>
                 <div class="functions">
                     <ul class="funs">
-                        <li class="fun-item" v-for="(item,i) in existFuns" :key="i" @click="setCalcType(item)">
-                            <span>{{item.name}}</span>
+                        <li class="fun-item" v-for="(item,i) in existFunsData" :key="i" @click="setCalcType(item)">
+                            <span>{{parseExistFunLabel(item)}}</span>
                         </li>
                     </ul>
                 </div>
                 <div>
                     <el-divider><strong>插入符号</strong></el-divider>
                     <div class="symbol">
-                        <div class="symbol-item" v-for="(sym,i) in symbolData" :key="i" :class="{'set-position-top': i < 5,'set-position-left': i % 5 == 0}" @click="setSymbols(sym)">{{ sym.value }}</div>
+                        <div class="symbol-item" v-for="(sym,i) in symbolDataRes" :key="i" :class="{'set-position-top': i < 5,'set-position-left': i % 5 == 0}" @click="setSymbols(sym)">{{ parseSymbolLabel(sym) }}</div>
                     </div>
                 </div>
             </el-col>
@@ -60,6 +60,7 @@
         <el-dialog
         title="选择指标"
         :visible.sync="selIndrDialog"
+        :modal="false"
         width="60%">
         <Indicator @selctedIndictorDataChange="selctedIndictorDataChange" />
         <span slot="footer" class="dialog-footer">
@@ -81,14 +82,51 @@ import CheckCalc from './checkCalc'
 export default {
     name:'IndrCalculation',
     props:{
-        prop:{type:Object,default(){
-            return {
-                value:'id',
-                label:'value'
+        calcRef:{type:String,default(){return 'claculation'}},
+        prop:{
+            type:Object,
+            default(){
+                return {
+                    label:(data, node)=>{
+                        return 'value'
+                    },
+                    // children: 'zones',
+                    disabled:(data,node)=>{
+                        if(node.level > 3)return false;
+                        else return true;
+                    },
+                    isLeaf: (data,node)=>{
+                        if(node.level > 3)return true;
+                        else return data.leaf;
+                    }
+                }
             }
-        }},
-        existFuns:{type:Array | Function,default(){
-            return [
+        },
+        dividerOption:{
+            type:Array,
+            default(){
+                return ['筛选指标','维度选择','可选指标','已选中指标']
+            }
+        },
+        dimensionProp:{
+            type:Object | Function,
+            default(){
+                return (data)=>{
+                    return data.value
+                }
+            }
+        },
+        indicatorListProp:{type:Object | Function,default(){return {label:'value'}}},
+        calcSymbolProp:{type:Object | Function,default(){return {label:'value'}}},
+        existFunProp:{type:Object | Function,default(){return {label:'name'}}},
+        parseCalcBoardLabel:{
+            type:Function,
+            default:(item)=>{
+                return item.value
+            }
+        },
+        existFuns:{type:Function,default:(resolve)=>{
+            let data =  [
                 {
                     id:'001',
                     name:'求和',
@@ -115,9 +153,10 @@ export default {
                     value:"hybirdOpration"
                 }
             ]
+            resolve(data);
         }},
-        symbolData:{type:Array | Function,default(){
-            return [
+        symbolData:{type:Function,default:(resolve)=>{
+            let data =  [
                 {
                     id:'001',
                     type:'symbol',
@@ -229,6 +268,7 @@ export default {
                     value:"delete"
                 }
             ]
+            resolve(data);
         }},
         loadIndrNode:{type:Function,default: (node, resolve)=>{//指标树形结构load方法
             defaultLoadIndr(node, resolve);
@@ -252,6 +292,12 @@ export default {
                 resolve(data);
             });
         }},
+        calcIndrSelectChange:{
+            type:Function,
+            default:(resolve,newData,oldData)=>{
+                resolve(newData);
+            }
+        },
         getIndrDatas:{type:Function,default:(data)=>{//获取指标数据
             return [
                 {id:'001',value:'普通本科生因其他休退学数1'},
@@ -269,7 +315,31 @@ export default {
     },
     components:{Calculations,ValiditorCalc,Indicator,CheckCalc},
     data(){
+        let _this = this;
         return {
+            parseIndrListLabel:(item)=>{
+                if(_this.indicatorListProp.toLocaleString() == "[object Object]"){
+                   return item[_this.indicatorListProp.label]
+                }else{
+                    return _this.indicatorListProp.bind(_this)(item,_this)
+                }
+            },
+            parseSymbolLabel(symbol){
+                if(_this.calcSymbolProp.toLocaleString() == "[object Object]"){
+                   return symbol[_this.calcSymbolProp.label]
+                }else{
+                    return _this.calcSymbolProp.bind(_this)(symbol,_this)
+                }
+            },
+            parseExistFunLabel(symbol){
+                if(_this.existFunProp.toLocaleString() == "[object Object]"){
+                   return symbol[_this.existFunProp.label]
+                }else{
+                    return _this.existFunProp.bind(_this)(item,_this)
+                }
+            },
+            existFunsData:[],
+            symbolDataRes:[],
             selectedIndr:[],
             selectedIndrCorpy:[],
             subSelectedIndr:[],
@@ -288,19 +358,46 @@ export default {
             indrSelectChange:this.indrSelectChange,
             dimensionData:this.dimensionData,
             getIndrDatas:this.getIndrDatas,
+            calcIndrSelectChange:this.calcIndrSelectChange,
+            indrPprops:this.prop,
+            indicatorListProp:this.indicatorListProp,
+            calcSymbolProp:this.calcSymbolProp,
+            existFunProp:this.existFunProp,
+            parseCalcBoardLabel:this.parseCalcBoardLabel,
+            dimensionProp:this.dimensionProp,
+            dividerOption:this.dividerOption,
         }
     },
+    mounted(){
+        this.getSymbolDataRes();
+        this.getExistFunsData();
+    },
     methods:{
+        getExistFunsData(){
+            new Promise((resolve,reject)=>{
+                this.existFuns(resolve);
+            }).then(data=>{
+                this.$set(this,'existFunsData',data)
+            });
+        },
+        getSymbolDataRes(){
+            new Promise((resolve,reject)=>{
+                this.symbolData(resolve);
+            }).then(data=>{
+                this.$set(this,'symbolDataRes',data)
+            });
+        },
         completeCalc(){
-            let leftBreaks = this.calculationRes.filter(item=>{return item.value == '('});
-            let rightBreaks = this.calculationRes.filter(item=>{return item.value == ')'});
+            let leftBreaks = this.calculationRes.filter(item=>{return this.parseSymbolLabel(item) == '('});
+            let rightBreaks = this.calculationRes.filter(item=>{return this.parseSymbolLabel(item) == ')'});
             if(leftBreaks.length == rightBreaks.length){
-                if(this.calculationRes[this.calculationRes.length -1] && this.calculationRes[this.calculationRes.length -1].type == 'symbol' && this.calculationRes[this.calculationRes.length -1].value != ')'){
-                    this.$message({
-                        message:'公式运算逻辑有误！',
-                        type:'error'
-                    })
-                }else this.$emit('complete',this.calculationRes);
+                // if(this.calculationRes[this.calculationRes.length -1] && this.calculationRes[this.calculationRes.length -1].type == 'symbol' && this.calculationRes[this.calculationRes.length -1].value != ')'){
+                //     this.$message({
+                //         message:'公式运算逻辑有误！',
+                //         type:'error'
+                //     })
+                // }else this.$emit('complete',this.calculationRes);
+                this.$emit('complete',this.calculationRes);
             }else{
                 this.$message({
                     message:'公式逻辑有误，缺少 "(" 或 ")"！',
@@ -336,8 +433,8 @@ export default {
             if(this.changeTarCalcItem){
                 calculationRes[this.changeTarCalcItemIndex] = fun;
             }else{
-                let leftBresk = this.symbolData.filter(item=>{
-                    return item.value == '(';
+                let leftBresk = this.symbolDataRes.filter(item=>{
+                    return this.parseSymbolLabel(item) == '(';
                 });
                 leftBresk.unshift(fun)
                 calculationRes = calculationRes.concat(leftBresk);
@@ -354,7 +451,7 @@ export default {
                 });
                 return false;
             }
-            if(symbol.value == 'delete'){
+            if(this.parseSymbolLabel(symbol) == 'delete'){
                 if(calculationRes[calculationRes.length-2].type == 'function'){
                     calculationRes.pop();
                     calculationRes.pop();
@@ -394,7 +491,7 @@ export default {
         },
         filterIndr(val){
             this.selectedIndr = this.selectedIndrCorpy.filter(item => {
-                return item[this.prop.label].indexOf(val) != -1;
+                return this.parseIndrListLabel(item).indexOf(val) != -1;
             });
         },
         selIndr(){

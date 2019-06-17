@@ -14,15 +14,14 @@
                     <span :key="i" >
                         <span
                         class="indr-symbol-item" 
-                        :class="{symbolItem:item.type == 'symbol',activeCalc: curntCalcTar && curntCalcTar.id == item.id && curntCalcTar.value == item.value && curntCalcTarIndex == i,activeFun:item.type == 'function'}" 
+                        :class="{symbolItem:item.type == 'symbol' || typeof item == 'string',activeCalc: curntCalcTar && curntCalcTar.id == item.id && curntCalcTar.value == item.value && curntCalcTarIndex == i,activeFun:item.type == 'function'}" 
                         @click="calcItemActivr(item,i)">
-                            <span>{{item.value}}</span>
+                            <span>{{parseCalcBoardLabel(item)}}</span>
                         </span>
                         <el-tooltip v-if="curntCalcTar && curntCalcTar.id == item.id  && curntCalcTar.value == item.value && curntCalcTarIndex == i && curntCalcTar.type != 'function'" content="删除" placement="bottom" effect="light">
                             <el-button icon="el-icon-close" size="mini" class="reduceCalcItem" circle @click="delCalcItem(item,i)"></el-button>
                         </el-tooltip>
                     </span>
-                    
                 </template>
             </div>
         </div>
@@ -41,15 +40,10 @@ export default {
             },deep:true
         }
     },
+    inject:["parseCalcBoardLabel"],
     data(){
+        let _this = this;
         return {
-            getCurntSymbol(i){
-                if(this.currentSymbols[i]){
-                    return this.currentSymbols[i];
-                }else{
-                    return '';
-                }
-            },
             curntCalcTar:null,
             curntCalcTarIndex:null,
         }

@@ -4,7 +4,7 @@
         <el-dialog
             title="绑定指标"
             :visible.sync="dialogVisible"
-            append-to-body
+            :modal="false"
             width="60%">
             <indicator @selctedIndictorDataChange="selctedIndictorDataChange" />
             <div slot="footer" class="dialog-footer">
@@ -25,10 +25,14 @@ export default {
             resIndrVal:null
         }
     },
-    inject:["cellBindIndr","getCurrentActiveCell"],
+    inject:["cellBindIndr","getCurrentActiveCell","updateCurrentActiveCell"],
     components:{indicator},
-    methods:{
+    methods:{ 
         bindCellIndicator(){
+            let currentCell = this.getCurrentActiveCell();
+            currentCell.cell_indr = this.resIndrVal;
+            currentCell.cell_content_type = this.resIndrVal.data_type;
+            this.updateCurrentActiveCell(currentCell);
             this.cellBindIndr(this.getCurrentActiveCell(),this.resIndrVal);
             this.dialogVisible = false;
         },

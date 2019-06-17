@@ -10,8 +10,9 @@
         </p>
         <el-dialog
             title="配置选项"
+            v-if="confVisible"
             :visible.sync="confVisible"
-            append-to-body
+            :modal="false"
             width="48%">
             <div class="inputTypeConf">
                 <TreeConf v-if="typeSelData.label == 'tree'" @resInputSelectionVal="inputTypeConfResVal"/>
@@ -38,6 +39,11 @@ export default {
         currentActiveCell:{
             handler(newVal,oldVal){
                 this.typeValue = newVal.cell_render_type;
+                this.typeData.forEach(data=>{
+                    if(data.label == this.typeValue){
+                        this.$set(this,'typeSelData',data);
+                    }
+                });
             },deep:true
         }
     },
