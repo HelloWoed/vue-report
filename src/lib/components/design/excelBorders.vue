@@ -162,6 +162,7 @@ export default {
                 let startTarAttr = getAttrs(this.borderConf.startTarget);
                 let tableData = this.getTableData();
                 let startTarStyle = tableData[startTarAttr.row][startTarAttr.col].cell_style;
+                startTarStyle = JSON.parse(JSON.stringify(startTarStyle));
                 delete startTarStyle.height;
                 delete startTarStyle.width;
                 let startVal = tableData[startTarAttr.row][startTarAttr.col].cell_value;
@@ -172,7 +173,7 @@ export default {
                         if(this.copyConf.ctrl){
                             for(let i = minRow; i <= maxRow; i++){
                                 tableData[i][maxCol].cell_value = startVal;
-                                tableData[i][maxCol].cell_style = JSON.parse(JSON.stringify(JSON.parse(JSON.stringify(startTarStyle))));
+                                tableData[i][maxCol].cell_style = JSON.parse(JSON.stringify(Object.assign(tableData[i][maxCol].cell_style,startTarStyle)));
                             }
                         }else{
                             if(startTarAttr.row == minRow){
@@ -182,7 +183,7 @@ export default {
                                         value = '0'+ value;
                                     }
                                     tableData[i][maxCol].cell_value = value;
-                                    tableData[i][maxCol].cell_style = JSON.parse(JSON.stringify(startTarStyle));
+                                    tableData[i][maxCol].cell_style = Object.assign(tableData[i][maxCol].cell_style,startTarStyle);
                                 }
                             }
                             if(startTarAttr.row == maxRow){
@@ -192,14 +193,14 @@ export default {
                                         value = '0'+ value;
                                     }
                                     tableData[j][maxCol].cell_value = value;
-                                    tableData[j][maxCol].cell_style = JSON.parse(JSON.stringify(startTarStyle));
+                                    tableData[j][maxCol].cell_style = Object.assign(tableData[i][maxCol].cell_style,startTarStyle);
                                 }
                             }
                         }
                     }else{
                         for(let i = minRow; i <= maxRow; i++){
                             tableData[i][maxCol].cell_value = startVal;
-                            tableData[i][maxCol].cell_style = JSON.parse(JSON.stringify(startTarStyle));
+                            tableData[i][maxCol].cell_style = Object.assign(tableData[i][maxCol].cell_style,startTarStyle);
                         }
                     }
                 }
@@ -208,7 +209,7 @@ export default {
                         if(this.copyConf.ctrl){
                             for(let j = minCol; j <= maxCol; j++){
                                 tableData[maxRow][j].cell_value = startVal;
-                                tableData[maxRow][j].cell_style = JSON.parse(JSON.stringify(startTarStyle));
+                                tableData[maxRow][j].cell_style = Object.assign(tableData[i][maxCol].cell_style,startTarStyle);
                             }
                         }else{
                             if(startTarAttr.col == minCol){
@@ -218,7 +219,7 @@ export default {
                                         value = '0'+ value;
                                     }
                                     tableData[maxRow][i].cell_value = value;
-                                    tableData[maxRow][i].cell_style = JSON.parse(JSON.stringify(startTarStyle));
+                                    tableData[maxRow][i].cell_style = Object.assign(tableData[i][maxCol].cell_style,startTarStyle);
                                 }
                             }
                             if(startTarAttr.col == maxCol){
@@ -228,14 +229,14 @@ export default {
                                         value = '0'+ value;
                                     }
                                     tableData[maxRow][j].cell_value = value;
-                                    tableData[maxRow][j].cell_style = JSON.parse(JSON.stringify(startTarStyle));
+                                    tableData[maxRow][j].cell_style = Object.assign(tableData[i][maxCol].cell_style,startTarStyle);
                                 }
                             }
                         }
                     }else{
                         for(let j = minCol; j <= maxCol; j++){
                             tableData[maxRow][j].cell_value = startVal;
-                            tableData[maxRow][j].cell_style = JSON.parse(JSON.stringify(startTarStyle));
+                            tableData[maxRow][j].cell_style = Object.assign(tableData[i][maxCol].cell_style,startTarStyle);
                         }
                     }
                 }
